@@ -15,26 +15,30 @@ A linked list can be reversed either iteratively or recursively. Could you imple
 
 *  iterative
 
-  ```js
-  var reverseList = function (head) {
-    if (!head || !head.next) return head;
-    let pre = null,
-      cur = head;
-    while (cur) {
-      let next = cur.next;
-      cur.next = pre;
-      pre = cur;
-      cur = next;
-    }
-    head = pre;
-    return head;
-  };
-  ```
+*  时间复杂度：O(n)。 假设 n 是列表的长度，时间复杂度是 O(n)。
+
+*  空间复杂度：O(1)
+
+   ```js
+   var reverseList = function (head) {
+     if (!head || !head.next) return head;
+     let pre = null,
+       cur = head;
+     while (cur) {
+       let next = cur.next;
+       cur.next = pre;
+       pre = cur;
+       cur = next;
+     }
+     head = pre;
+     return head;
+   };
+   ```
 
 * recursive
 
-  ```js
-  var reverseList = function (head) {
+* ```js
+var reverseList = function (head) {
     if (!head || !head.next) return head;
     let next = head.next;
     let reversedHead = reverseList(next);
@@ -43,7 +47,7 @@ A linked list can be reversed either iteratively or recursively. Could you imple
     return reversedHead;
   };
   ```
-
+  
   
 
 ### [21. Merge Two Sorted Lists](https://leetcode-cn.com/problems/merge-two-sorted-lists/)
