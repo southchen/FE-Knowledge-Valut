@@ -1,3 +1,5 @@
+[TOC]
+
 # Recursion 🔁
 
 ### Complexity
@@ -26,6 +28,8 @@ Find the `recurrence relation`:
 * Pascal's Triangle
 
   *f*(*i*,*j*)=*f*(*i*−1,*j*−1)+*f*(*i*−1,*j*)
+
+## Optimization 
 
 #### Memorization
 
@@ -68,6 +72,61 @@ Complexity with memorization:
 
 O(1)∗*n*=O(*n*)
 
+#### Tail recursion
+
+A recursive function is tail recursive when recursive call is the last thing executed by the function.
+
+<img src='https://assets.leetcode.com/uploads/2019/01/26/card_recursion_tail.png'>
+
+Tail recursion + stack = ieteration
+
+## Use cases
+
+#### Deep copy
+
+```js
+   function deepCopy(obj) {
+          let newObj = {};
+          function copy(obj) {
+            Object.keys(obj).forEach((key) => {
+              if (typeof obj[key] === 'object') {
+                newObj[key] = deepCopy(obj[key]);
+                console.log(newObj[key]);
+              } else {
+                newObj[key] = obj[key];
+                return obj;
+              }
+            });
+          }
+
+          copy(obj);
+          return newObj;
+        }
+```
+
+#### Flaten an array
+
+```js
+ function flaten(arr) {
+        let res = [];
+        const recursion = (arr) => {
+          if (!arr.length) return;
+          for (let i = 0; i < arr.length; i++) {
+            if (Object.prototype.toString.call(arr[i]) != '[object Array]') {
+              res.push(arr[i]);
+            } else {
+              recursion(...arr.slice(i, arr.length + 1));
+            }
+          }
+        };
+        recursion(arr);
+        return res;
+      }
+
+```
+
+
+
 ## Leetcode 
 
 #### [344] Reverse String
@@ -81,7 +140,7 @@ var reverseString = function (s) {
 };
 ````
 
-##### [118] Pascal's triangle
+#### [118] Pascal's triangle
 
 the argument of generate function was the row num.
 
@@ -115,7 +174,7 @@ var generate = function (numRows) {
 };
 ```
 
-##### [119] Pascal's triangle II
+#### [119] Pascal's triangle II
 
 change in-place
 
@@ -220,6 +279,8 @@ var kthGrammar = function (N, K) {
 };
 ```
 
+## Other sources
+
 #### [Hanota LCCI](https://leetcode-cn.com/problems/hanota-lcci/)
 
 the key of handling recursion is try to find the repeating relation but never dive into the details of each recursion.
@@ -286,10 +347,3 @@ function allCell(n){
 
 
 
-### Tail recursion
-
-A recursive function is tail recursive when recursive call is the last thing executed by the function.
-
-<img src='https://assets.leetcode.com/uploads/2019/01/26/card_recursion_tail.png'>
-
-Tail recursion + stack = ieteration
