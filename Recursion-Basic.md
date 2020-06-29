@@ -125,6 +125,20 @@ Tail recursion + stack = ieteration
 
 ```
 
+#### Curring
+
+```js
+   function currying(fn, length) {
+        length = length || fn.length;
+        return function (...args) {
+          return args.length >= length
+            ? fn.apply(this, args)
+            : currying(fn.bind(this, ...args), length - args.length);
+            //👆pass the updated fn aftering bind the current args and the updated length needed for completing the curry
+        };
+      }
+```
+
 
 
 ## Leetcode 
