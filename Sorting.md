@@ -52,11 +52,11 @@ function dbBubblue(arr) {
 
 When the original array was partial sorted: [4,2,1,` 5,6,8`]
 
-<img src="/640.png" alt="partialsorted" style="zoom:60%;" />
+<img src="https://mmbiz.qpic.cn/mmbiz_png/rSmDLkNsngSW854Q3xq3SbOQ1UtURzYVzEQSvXiapUbccLHiblO05vHiaQ7GzbRYjafwJTrfPicOwWCyXPqPw1rhrA/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1" alt="partialsorted" style="zoom:60%;" />
 
 After first round of loop, the array was : [2,1,`4,5,6,8`]
 
-<img src="/640 (1).png" alt="lastswappedindex" style="zoom: 50%;" />
+<img src="https://mmbiz.qpic.cn/mmbiz_png/rSmDLkNsngSW854Q3xq3SbOQ1UtURzYVQd4hQoDmrTTPJU7Jo0Qea8bJX2gwIYojj82B1RGmIR8ic8MAib2SLovQ/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1" alt="lastswappedindex" style="zoom: 50%;" />
 
 The element after LastSwappedIndex was already sorted.
 
