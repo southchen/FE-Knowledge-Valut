@@ -2,7 +2,140 @@
 
 # Sorting
 
-### Insertion
+## Bubble
+
+Time Complexity: O(n^2)
+
+Space Complexity: O(1)
+
+Stable
+
+```js
+function bubbleSort(arr){
+    var len=arr.length;
+    for(var i=len-1;i>0;i--){
+        for(var j=0;j<i;j++){
+            if(arr[j]>arr[j+1]){
+                [arr[j],arr[j+1]]=[arr[j+1],arr[j]]
+            }
+        }
+    }
+    return arr;
+}
+```
+
+### Optimized by double direction sorting:
+
+```js
+function dbBubblue(arr) {
+  let l = 0,
+    r = arr.length;
+  while (l < r) {
+    for (let i = l + 1; i < r; i++) {
+      if (arr[i] < arr[i - 1]) {
+        [arr[i], arr[i - 1]] = [arr[i - 1], arr[i]];
+      }
+    }
+    r--;
+    for (let i = r - 1; i > l; i--) {
+      if (arr[i] > arr[i + 1]) {
+        [arr[i], arr[i + 1]] = [arr[i + 1], arr[i]];
+      }
+    }
+    l++;
+  }
+  return arr;
+}
+```
+
+### Further optimization:
+
+When the original array was partial sorted: [4,2,1,` 5,6,8`]
+
+<img src="G:\study\PrepforInterview\640.png" alt="640" style="zoom:60%;" />
+
+After first round of loop, the array was : [2,1,`4,5,6,8`]
+
+<img src="G:\study\PrepforInterview\640 (1).png" alt="640 (1)" style="zoom: 50%;" />
+
+The element after LastSwappedIndex was already sorted.
+
+```js
+function bubbleSort(arr){
+    var len=arr.length;
+    for(var i=len-1;i>0;i--){
+        let swappedIndex=arr.length-1;
+        for(var j=0;j<swappedIndex;j++){
+            if(arr[j]>arr[j+1]){
+                [arr[j],arr[j+1]]=[arr[j+1],arr[j]]
+                swappedIndex=j;
+            }
+        }
+    }
+    return arr;
+}
+```
+
+### Expanded: a second argument to control the sqeuence
+
+```js
+function bubbleSort(arr, compareFunc) {
+  if (arr.length < 1) {
+    return arr;
+  }
+  for (let i = 1; i < arr.length; i++) {
+    for (let j = 0; j < arr.length - i; j++) {
+      if (compareFunc(arr[j], arr[j + 1]) > 0) {
+        [arr[j], arr[j + 1]] = [arr[j + 1], arr[j]];
+      }
+    }
+  }
+  return arr;
+}
+bubbleSort(arr, (a, b) => a - b);
+```
+
+
+
+## Selection
+
+Time Complexity: O(n^2)
+
+Space Complexity: O(1)
+
+Unstable
+
+> Selection sort has the property of minimizing the number of swaps. In applications where the cost of swapping items is high, selection sort very well may be the algorithm of choice.
+
+```js
+function selection(arr) {
+  for (let j = 0; j < arr.length; j++) {
+    let minIndex = -1,
+      min = Infinity;
+    for (let i = j; i < arr.length; i++) {
+      if (arr[i] <= min) {
+        min = arr[i];
+        minIndex = i;
+      } else {
+        continue;
+      }
+    }
+
+    [arr[j], arr[minIndex]] = [arr[minIndex], arr[j]];
+  }
+  return arr;
+}
+```
+
+
+
+## Insertion
+
+Time Complexity: O(n^2)
+
+Space Complexity: O(1)
+
+Stable
 
 ![insertion](https://www.2cto.com/uploadfile/Collfiles/20180616/20180616142937108.png)
 
@@ -23,7 +156,7 @@
       }
 ```
 
-用二分法改进插入过程
+optimized by bisection when insert the new element into the sorted array:
 
 ```js
 function binaryInsertionSort(array) {
@@ -47,9 +180,7 @@ function binaryInsertionSort(array) {
 }
 ```
 
-
-
-### Quick
+## Quick
 
 Left ➡️ pivot ➡️ right recursively
 
@@ -70,15 +201,19 @@ Complexity: O(nlogn)
    }
 ```
 
-### Merge
+## Merge
 
-Complexity: O(nlogn)
+Time Complexity: O(nlogn)
+
+Space Complexity: O(n)
+
+Stable
 
 ![merge](https://user-gold-cdn.xitu.io/2019/7/23/16c1f400a4920693?imageslim)
 
 ```js
 function mergeSorting(nums){
-    if(nums.length<=0) return nums;
+    if(nums.length<2) return nums;
     let mid = Math.floor(nums.length/2)
     let left = nums.slice(0,mid)
     let right = nums.slice(mid);
@@ -103,7 +238,38 @@ function mergeSorting(nums){
 }
 ```
 
-### Selection
+Optimization:
+
+```js
+function mergeSorting(nums){
+    if(nums.length<2) return nums;
+    let mid = Math.floor(nums.length/2)
+    let left = nums.splice(0,mid)
+    let right = nums
+    function merge(left,right){
+        let res=[];
+        while(left.legth&&right.length){
+            if(left[0]<=right[0]){
+            res.push(left.shift())
+        }else{
+            res.push(right.shift())
+        }
+              }
+           while(left.length){
+        res.push(left.shift());
+    }
+    while(right.length){
+        res.push(right.shift());
+    }
+        return res;
+    }
+    merge(mergeSorting(left),mergeSorting(right))
+}
+```
+
+
+
+## Selection
 
 No extra memory sapce;
 
@@ -125,23 +291,48 @@ TimeComplexity: O(n2) double loop
 }
 ```
 
-### Bubble
+### Shell
 
-Complexity: O(n^2)
+An optimization of insertion for moving more than 1 positon
 
 ```js
-function bubbleSort(arr){
-    var len=arr.length;
-    for(var i=len-1;i>0;i--){
-        for(var j=0;j<i;j++){
-            if(arr[j]>arr[j+1]){
-                var tmp = arr[j];
-                arr[j]=arr[j+1];
-                arr[j+1]=tmp
-            }
-        }
+function shellSort(arr) {
+  const len = arr.length;
+  let gap = Math.floor(len / 2);
+
+  while (gap > 0) {
+    // 注意下面这段 for 循环和插入排序极为相似
+    for (let i = gap; i < len; i++) {
+      const temp = arr[i];
+      let preIndex = i - gap;
+
+      while (arr[preIndex] > temp) {
+        arr[preIndex + gap] = arr[preIndex];
+        preIndex -= gap;
+      }
+      arr[preIndex + gap] = temp;
     }
-    return arr;
+    gap = Math.floor(gap / 2);
+  }
+
+  return arr;
 }
 ```
 
+### Heap
+
+an optimization for insertion. Using heap to store
+
+Time Complexity: O(nlogn)
+
+Space Complexity: O()
+
+```
+
+```
+
+
+
+
+
+ref:<a src='https://www.rayjune.me/2018/03/22/elegant-javascript-sorting-algorithm-es6/'>优雅的 JavaScript 排序算法（ES6）</a>
