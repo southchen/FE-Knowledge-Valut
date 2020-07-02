@@ -212,10 +212,11 @@ function quick(nums) {
   return nums;
 }
 function quickSort(nums, left, right) {
-  if (left >= right) {
-    return;
-  }
-  let pivot = nums[right];
+  if (left >= right) return;
+  //let pivot = nums[right];
+    //in case of the worst case, randomlize the pivot pointer
+    let randomIndex = left+Math.floor(Math.random()*(right-left));
+    let pivot=nums[randomIndex]
   let j = right - 1,
     i = left;
   while (i <= j) {
