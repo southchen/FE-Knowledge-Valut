@@ -186,6 +186,8 @@ Left ➡️ pivot ➡️ right recursively
 
 Complexity: O(nlogn)
 
+Extra space needed:
+
 ```js
   function quick(nums) {
         if (nums.length <= 1) return nums;
@@ -200,6 +202,38 @@ Complexity: O(nlogn)
    return [...quick(left), ...pivot, ...quick(right)]; //recursion
    }
 ```
+
+Using pointer as partition, no extra space needed:
+
+```js
+function quick(nums) {
+  if (nums.length < 2) return nums;
+  quickSort(nums, 0, nums.length - 1);
+  return nums;
+}
+function quickSort(nums, left, right) {
+  if (left >= right) return;
+  //let pivot = nums[right];
+    //in case of the worst case, randomlize the pivot pointer
+    let randomIndex = left+Math.floor(Math.random()*(right-left));
+    let pivot=nums[randomIndex]
+  let j = right - 1,
+    i = left;
+  while (i <= j) {
+    if (nums[i] <= pivot) {
+      i++;
+    } else {
+      [nums[i], nums[j]] = [nums[j], nums[i]];
+      j--;
+    }
+  }
+  [nums[i], nums[right]] = [nums[right], nums[i]];
+  quickSort(nums, left, i - 1);
+  quickSort(nums, i + 1, right);
+}
+```
+
+
 
 ## Merge
 
