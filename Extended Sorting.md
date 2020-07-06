@@ -2,6 +2,8 @@
 
 ## Quick sorting related questions
 
+Using pointer as partition
+
 ### [75. Sort Colors](https://leetcode-cn.com/problems/sort-colors/)
 
 Partition:
@@ -70,5 +72,11 @@ function quickSelect(nums, left, right, k) {
     return quickSelect(nums, left, i - 1, k - right + i - 1);
   }
 }
+```
+
+#### [88. Merge Sorted Array](https://leetcode-cn.com/problems/merge-sorted-array/)
+
+```
+
 ```
 
