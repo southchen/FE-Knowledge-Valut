@@ -207,6 +207,7 @@ Using pointer as partition, no extra space needed:
 
 ```js
 function quick(nums) {
+    //trim
   if (nums.length < 2) return nums;
   quickSort(nums, 0, nums.length - 1);
   return nums;
@@ -217,9 +218,13 @@ function quickSort(nums, left, right) {
     //in case of the worst case, randomlize the pivot pointer
     let randomIndex = left+Math.floor(Math.random()*(right-left));
     let pivot=nums[randomIndex]
+    //two partition, [left,i) smaller than pivot; 
+    //(i,j) unsorted area; 
+    //(j,right] greater than pivot
   let j = right - 1,
     i = left;
   while (i <= j) {
+      //exit point: when i and j come across
     if (nums[i] <= pivot) {
       i++;
     } else {
@@ -227,7 +232,9 @@ function quickSort(nums, left, right) {
       j--;
     }
   }
+    //when the loop finished, i pointing to the sorted position, the nums[i] is greater than pivot. So swap it with the pivot (current at the end of the arry)
   [nums[i], nums[right]] = [nums[right], nums[i]];
+    //call the function recursively
   quickSort(nums, left, i - 1);
   quickSort(nums, i + 1, right);
 }
