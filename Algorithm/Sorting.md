@@ -281,33 +281,45 @@ function mergeSorting(nums){
 }
 ```
 
-Optimization:
+Optimization by replacing slice with splice
+
+```js
+
+    let mid = Math.floor(nums.length/2)
+    let left = nums.splice(0,mid)
+    let right = nums
+
+```
+
+Using pointer as paritition to merge the array, (update in-place on the old array)
 
 ```js
 function mergeSorting(nums){
     if(nums.length<2) return nums;
     let mid = Math.floor(nums.length/2)
-    let left = nums.splice(0,mid)
-    let right = nums
-    function merge(left,right){
-        let res=[];
-        while(left.legth&&right.length){
-            if(left[0]<=right[0]){
-            res.push(left.shift())
-        }else{
-            res.push(right.shift())
+    let left = nums.slice(0,mid)
+    let right = nums.slice(mid);
+  	merge(mergeSorting(left),mergeSorting(right))
+   }
+
+function merge(left,right){
+        //let res=[]; 
+    let temp=[...left,...right]
+    let i=left,m=mid+1,j=left;
+        while(i<=mid&&j<=right){
+            if(nums[i]<=nums[m]){ //<= makes the sorting stable
+                temp[j]=nums[i];
+                i++
+            }else{
+                temp[j]=nums[m]
+                m++
+            }
+            if(i<=mid){
+                temp[j]=nums[i]
+            }
         }
-              }
-           while(left.length){
-        res.push(left.shift());
+    return temp;
     }
-    while(right.length){
-        res.push(right.shift());
-    }
-        return res;
-    }
-    merge(mergeSorting(left),mergeSorting(right))
-}
 ```
 
 
@@ -406,7 +418,16 @@ function heapify(arr, index, size) {
 }
 ```
 
+## in-place sorting 
 
+* insertion
+* selection
+
+## Stability
+
+<img src='https://mmbiz.qpic.cn/mmbiz_png/rSmDLkNsngTPoibiaO4tryNfibHWTWW6FVuPticdfn8lEWe10fvgn78nRyVfmrOTlreSwlYMe8yhWnWATaRRlI60ng/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1' style="zoom: 67%;">
+
+<img src="https://mmbiz.qpic.cn/mmbiz_png/rSmDLkNsngTPoibiaO4tryNfibHWTWW6FVudIjia1oQEUORkJA7jIfD1ibj9IdUB6XjvYdqZwQ4ImialKic9pADVmkNkA/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1" style="zoom:67%;" />
 
 
 
