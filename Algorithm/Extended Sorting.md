@@ -130,5 +130,43 @@ var merge = function (nums1, m, nums2, n) {
 };
 ```
 
-## Merge Sorting
+#### [15. 3Sum](https://leetcode-cn.com/problems/3sum/)
+
+> Given an array nums of n integers, are there elements a, b, c in nums such that a + b + c = 0? Find all unique triplets in the array which gives the sum of zero.
+>
+> Note: The solution set must not contain `duplicate` triplets.
+>
+> Given array nums = [-1, 0, 1, 2, -1, -4],
+>
+> A solution set is:
+> [  [-1, 0, 1],  [-1, -1, 2] ]
+
+```js
+var threeSum = function (nums) {
+    //in order to filter out the duped num, sort the array firstly
+    //check if the nums[i] ==nums[i-1] for dupeplicate
+  nums = nums.sort((a, b) => a - b);
+  let res = [];
+  let sum = 0;
+  for (let p = 0; p < nums.length; p++) { //outer loop
+    if (nums[p] > 0) break; //stop if it is greater than 0 already
+    if (nums[p] === nums[p - 1]) continue; // encounters dupe，jump out the loop
+    let l = p + 1;
+    let r = nums.length - 1;
+    while (l < r) {
+      sum = nums[l] + nums[r] + nums[p];
+      if (sum === 0) {
+        res.push([nums[p], nums[l], nums[r]]);
+        while (nums[l] === nums[l + 1]) l++; //untill meets the unique value
+        l++;
+      } else if (sum < 0) {
+        l++;
+      } else {
+        r--;
+      }
+    }
+  }
+  return res;
+};
+```
 
