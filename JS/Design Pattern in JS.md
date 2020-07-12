@@ -245,6 +245,29 @@ console.info(observerProxy);
 
 
 
+```js
+function createArray(...elements) {
+  let handler = {
+    get(target, propKey, receiver) {
+      let index = Number(propKey);
+      if (index < 0) {
+        propKey = String(target.length + index);
+      }
+      return Reflect.get(target, propKey, receiver);
+    }
+  };
+
+  let target = [];
+  target.push(...elements);
+  return new Proxy(target, handler);
+}
+
+let arr = createArray('a', 'b', 'c');
+arr[-1] // c
+```
+
+
+
 ## Decorator
 
 > Attach additional responsibilities to an object dynamically kepping the same interface. Decorators provid a flexible alternative to subclassing for extending functionality.
@@ -502,3 +525,27 @@ new View().init();
     </details>
 ```
 
+```javascript
+var pipe = function (value) {
+  var funcStack = [];
+  var oproxy = new Proxy({} , {
+    get : function (pipeObject, fnName) {
+      if (fnName === 'get') {
+        return funcStack.reduce(function (val, fn) {
+          return fn(val);
+        },value);
+      }
+      funcStack.push(window[fnName]);
+      return oproxy;
+    }
+  });
+
+  return oproxy;
+}
+
+var double = n => n * 2;
+var pow    = n => n * n;
+var reverseInt = n => n.toString().split("").reverse().join("") | 0;
+
+pipe(3).double.pow.reverseInt.get; // 63
+```
