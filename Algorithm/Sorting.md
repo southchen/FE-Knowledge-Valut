@@ -97,6 +97,63 @@ bubbleSort(arr, (a, b) => a - b);
 
 
 
+## Insertion
+
+Time Complexity: O(n^2)
+
+Space Complexity: O(1)
+
+Stable
+
+![insertion](https://www.2cto.com/uploadfile/Collfiles/20180616/20180616142937108.png)
+
+`挡板法`
+
+```js
+function insertion(arr) {
+  let temp;
+  for (let i = 1; i < arr.length; i++) {
+    temp = arr[i];
+    let j = i - 1;
+     //shifting
+    while (j >= 0 && temp < arr[j]) {
+      arr[j + 1] = arr[j]; //后移操作逻辑：j+1的元素被j元素覆盖，直到不应该移动的时候退出循环
+      j--;
+    }
+     //insert
+    arr[j + 1] = temp; //退出循环的两种情况：1.j==-1，即被插入的temp应该为第一个； 2.temp比arr[j]大了。需要把temp放好
+  
+  }
+  return arr;
+}
+```
+
+optimized by bisection when insert the new element into the sorted array:
+
+```js
+function binaryInsertionSort(array) {
+        for (var i = 1; i < array.length; i++) {
+            var key = array[i], left = 0, right = i - 1;
+            while (left <= right) {
+                var middle = parseInt((left + right) / 2);
+                if (key < array[middle]) {
+                    //critical: r=m-1
+                    right = middle - 1;
+                } else {
+                    //critical: l=m+1
+                    left = middle + 1;
+                }
+            }
+            for (var j = i - 1; j >= left; j--) {
+                array[j + 1] = array[j];
+            }
+            array[left] = key;
+        }
+        return array;
+    } 
+}
+```
+
 ## Selection
 
 Time Complexity: O(n^2)
@@ -129,62 +186,13 @@ function selection(arr) {
 
 
 
-## Insertion
-
-Time Complexity: O(n^2)
-
-Space Complexity: O(1)
-
-Stable
-
-![insertion](https://www.2cto.com/uploadfile/Collfiles/20180616/20180616142937108.png)
-
-```js
- function insert(arr) {
-        var len = arr.length;
-        var preIndex, current;
-        for (var i = 1; i < len; i++) {
-          preIndex = i - 1;
-          current = arr[i];
-          while (preIndex >= 0 && arr[preIndex] > current) {
-            arr[preIndex + 1] = arr[preIndex];
-            preIndex--;
-          }
-          arr[preIndex + 1] = current;
-        }
-        return arr;
-      }
-```
-
-optimized by bisection when insert the new element into the sorted array:
-
-```js
-function binaryInsertionSort(array) {
-        for (var i = 1; i < array.length; i++) {
-            var key = array[i], left = 0, right = i - 1;
-            while (left <= right) {
-                var middle = parseInt((left + right) / 2);
-                if (key < array[middle]) {
-                    right = middle - 1;
-                } else {
-                    left = middle + 1;
-                }
-            }
-            for (var j = i - 1; j >= left; j--) {
-                array[j + 1] = array[j];
-            }
-            array[left] = key;
-        }
-        return array;
-    } 
-}
-```
-
 ## Quick
 
 Left ➡️ pivot ➡️ right recursively
 
 Complexity: O(nlogn)
+
+unstable
 
 Extra space needed:
 
@@ -206,38 +214,32 @@ Extra space needed:
 Using pointer as partition, no extra space needed:
 
 ```js
-function quick(nums) {
-    //trim
-  if (nums.length < 2) return nums;
-  quickSort(nums, 0, nums.length - 1);
-  return nums;
+function quickSorting(nums) {
+  if (!nums.length) return;
+  return quick(nums, 0, nums.length - 1);
 }
-function quickSort(nums, left, right) {
-  if (left >= right) return;
-  //let pivot = nums[right];
-    //in case of the worst case, randomlize the pivot pointer
-    let randomIndex = left+Math.floor(Math.random()*(right-left));
-    let pivot=nums[randomIndex]
-    //two partition, [left,i) smaller than pivot; 
-    //(i,j) unsorted area; 
-    //(j,right] greater than pivot
-  let j = right - 1,
-    i = left;
+const quick = (nums, l, r) => {
+  if (l >= r) return;
+  let random = Math.floor(l + Math.random() * (r - l));
+  let pivot = nums[random];
+  [nums[random], nums[r]] = [nums[r], nums[random]];
+  let i = l;
+  j = r - 1;
   while (i <= j) {
-      //exit point: when i and j come across
-    if (nums[i] <= pivot) {
+    if (nums[i] < pivot) {
       i++;
     } else {
       [nums[i], nums[j]] = [nums[j], nums[i]];
       j--;
     }
   }
-    //when the loop finished, i pointing to the sorted position, the nums[i] is greater than pivot. So swap it with the pivot (current at the end of the arry)
-  [nums[i], nums[right]] = [nums[right], nums[i]];
-    //call the function recursively
-  quickSort(nums, left, i - 1);
-  quickSort(nums, i + 1, right);
-}
+  [nums[r], nums[i]] = [nums[i], nums[r]];
+    //only nums[i] is at the correct positon
+    //sort the left and right part recursively
+  quick(nums, l, j);
+  quick(nums, i + 1, r);
+  return nums;
+};
 ```
 
 
@@ -284,67 +286,62 @@ function mergeSorting(nums){
 Optimization by replacing slice with splice
 
 ```js
-
     let mid = Math.floor(nums.length/2)
     let left = nums.splice(0,mid)
     let right = nums
-
 ```
 
 Using pointer as paritition to merge the array, (update in-place on the old array)
 
 ```js
-function mergeSorting(nums){
-    if(nums.length<2) return nums;
-    let mid = Math.floor(nums.length/2)
-    let left = nums.slice(0,mid)
-    let right = nums.slice(mid);
-  	merge(mergeSorting(left),mergeSorting(right))
-   }
+function mergeSort(arr) {
+  __mergeSort(arr, 0, arr.length - 1);
+  return arr;
+}
 
-function merge(left,right){
-        //let res=[]; 
-    let temp=[...left,...right]
-    let i=left,m=mid+1,j=left;
-        while(i<=mid&&j<=right){
-            if(nums[i]<=nums[m]){ //<= makes the sorting stable
-                temp[j]=nums[i];
-                i++
-            }else{
-                temp[j]=nums[m]
-                m++
-            }
-            if(i<=mid){
-                temp[j]=nums[i]
-            }
-        }
-    return temp;
+function __mergeSort(arr, l, r) {
+  if (l >= r) return;
+  var mid = Math.floor((l + r) / 2);
+  __mergeSort(arr, l, mid);
+  __mergeSort(arr, mid + 1, r);
+  //若左边最大值比右边最小值大，则进行归并操作，否则表示两部分已有序，不需要再进行归并
+  if (arr[mid] > arr[mid + 1]) merge(arr, l, mid, r);
+}
+function merge(arr, l, mid, r) {
+  var copy = [];
+  for (var m = l; m <= r; m++) {
+    copy[m] = arr[m];
+  }
+  var i = l,
+    j = mid + 1,
+    k = l;
+  while (k <= r) {
+    while (i <= mid && j <= r) {
+      if (copy[i] <= copy[j]) {
+        arr[k] = copy[i];
+        i++;
+        k++;
+      } else {
+        arr[k] = copy[j];
+        j++;
+        k++;
+      }
     }
-```
-
-
-
-## Selection
-
-No extra memory sapce;
-
-TimeComplexity: O(n2) double loop
-
-```js
- function selectionSort(arr){
-   var len=arr.length;
-   var i,j,min;
-   for(i=0;i<len-1;i++){
-       min=i;   //将当前值设为最小值
-    for(j=i+1;j<len;j++){
-      if(arr[j]<arr[min]){
-         	min=j;  //在后面找到更小的值
-      		 }
-		[arr[i],arr[min]]= [arr[min],arr[i]]
-	}
-	return arr;
+    while (i <= mid) {
+      arr[k] = copy[i];
+      i++;
+      k++;
+    }
+    while (j <= r) {
+      arr[k] = copy[j];
+      j++;
+      k++;
+    }
+  }
 }
 ```
+
+
 
 ### Shell
 
