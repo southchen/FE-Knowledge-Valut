@@ -2,16 +2,17 @@
 
 # Sliding window
 
-Use case: find target sub-string in a string, return the index/max length ... of the target string
+* 1、当移动 right 扩大窗口，即加入字符时，应该更新哪些数据?
 
-using two pointer to maintain the window (left and right)
+* 2、什么条件下，窗口应该暂停扩大，开始移动 left 缩小窗口?
+
+* 3、当移动 left 缩小窗口，即移出字符时，应该更新哪些数据?
+
+* 4、我们要的结果应该在扩大窗口时还是缩小窗口时进行更新?
 
 ## Template
 
 ```js
-// origin string: s; target srting: word 
-let s = ...;
-let word = ...;
 // pointers
 let left = 0,right = 0;
 // init the windows
@@ -43,7 +44,15 @@ while(right < target.length){
 }
 ```
 
+## Leetcode
+
 #### [3. Longest Substring Without Repeating Characters](https://leetcode-cn.com/problems/longest-substring-without-repeating-characters/)
+
+最⻓无重复子串
+
+condition: without repeating -> count >1 shrink window
+
+result: length
 
 ```js
 var lengthOfLongestSubstring = function (s) {
@@ -53,22 +62,27 @@ var lengthOfLongestSubstring = function (s) {
   let max = 0;
   while (r < s.length) {
     map[s[r]] ? map[s[r]]++ : (map[s[r]] = 1);
+          //shrink window when count >1
     while (map[s[r]] > 1) {
       map[s[l]]--;
       l++;
     }
+       //update result
     max = Math.max(r - l + 1, max);
+     //expand
     r++;
   }
   return max;
 };
 ```
 
-using map to store the element:index pair
+##### Optimization
+
+using map to store the element-index pair
 
 everytime encounter a duplicate element (Map.has()), no need to move left pointer one step per loop
 
-move left pointer to the max (left, and the duplicate + 1)
+move left pointer to the max (left, and the duplicate + 1) directly
 
 ```js
 
@@ -89,6 +103,8 @@ var lengthOfLongestSubstring = function (s) {
 
 
 #### [76. Minimum Window Substring](https://leetcode-cn.com/problems/minimum-window-substring/)
+
+最小覆盖子串
 
 ```js
 var minWindow = function (s, t) {
@@ -185,65 +201,87 @@ var maxSlidingWindow = function (nums, k) {
 #### [438. Find All Anagrams in a String](https://leetcode-cn.com/problems/find-all-anagrams-in-a-string/)
 
 ```js
-var findAnagrams = function(s, p) {
-    const res = [], need = {}, local = {};
-    for(const ch of p)  {
-        if(ch in need)  ++need[ch];
-        else    need[ch]=1;
+var findAnagrams = function (s, p) {
+  let map = {};
+  let needed = 0;
+  for (ch of s) {
+    if (!map[ch]) {
+      map[ch] = 1;
+      needed++;
+    } else {
+      map[ch]++;
     }
-    let to_match = Object.keys(need).length;
-    for(let l=0,r=0;r<s.length;++r){
-        if(s[r] in local)   ++local[s[r]];
-        else    local[s[r]]=1;
-        if(s[r] in need&&local[s[r]]===need[s[r]])  --to_match;
-        while(l<=r&&to_match===0){
-            if(r-l+1===p.length)    res.push(l);
-            local[s[l]]--;
-            if(s[l] in need&&local[s[l]]<need[s[l]])    ++to_match;
-            ++l;
-        }
+  }
+  let l = 0,
+    r = 0;
+  let res = [];
+  while (r <= s.length - 1) {
+    if (map[s[r]] != undefined) {
+      map[s[r]]--;
     }
-    return res;
+    if (map[s[r]] === 0) {
+      needed--;
+    }
+    while (needed == 0) {
+      if (r - l + 1 === p.length) res.push(l);
+      if (map[s[l]] != undefined) {
+        map[s[l]]--;
+        if (map[s[l]] === 0) needed++;
+      }
+      l++;
+    }
+
+    r++;
+  }
+  return res;
 };
 ```
 
+
+
 #### [567. Permutation in String](https://leetcode-cn.com/problems/permutation-in-string/)
 
-similar as 438
+字符串排列  similar as 438
+
+> Input: s1 = "ab" s2 = "eidbaooo"
+> Output: True
+> Explanation: s2 contains one permutation of s1 ("ba").
 
 ```js
-var checkInclusion = function(s1, s2) {
-    let left = 0,right = 0;
-    let needs = {},windows = {};
-    let match = 0;
-    for(let i = 0;i < s1.length;i++){
-        needs[s1[i]] ? needs[s1[i]]++ : needs[s1[i]] = 1;
+var checkInclusion = function (s1, s2) {
+  let needed = 0;
+  let map = {};
+  for (let c of s1) {
+    if (map[c]) {
+      map[c]++;
+    } else {
+      map[c] = 1;
+      needed++;
     }
-    let needsLen = Object.keys(needs).length;
-    while(right < s2.length){
-        let c1 = s2[right];
-        if(needs[c1]){
-            windows[c1] ? windows[c1]++ : windows[c1] = 1;
-            if(windows[c1] === needs[c1]){
-                match++;
-            }
+  }
+  let l = 0,
+    r = 0;
+  while (r < s2.length) {
+    //condition of expanding
+    if (map[s2[r]] != undefined) {
+      map[s2[r]]--;
+      if (map[s2[r]] === 0) {
+        needed--;
+        //the condition of shrinking
+        while (needed === 0) {
+          //check if match the target condition
+          if (r - l + 1 === s1.length) return true;
+          if (map[s2[l]] != undefined) {
+            map[s2[l]]++;
+            if (map[s2[l]] > 0) needed++;
+          }
+          l++;
         }
-        right++;
-        while(match === needsLen){
-            if(right - left === s1.length){
-                return true;
-            }
-            let c2 = s2[left];
-            if(needs[c2]){
-                windows[c2]--;
-                if(windows[c2] < needs[c2]){
-                    match--;
-                }
-            }
-            left++;
-        }
+      }
     }
-    return false;
+    r++;
+  }
+  return false;
 };
 
 ```
