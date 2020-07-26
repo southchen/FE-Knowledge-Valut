@@ -41,6 +41,19 @@ var gen = iterArr(arr);
 arr = [...gen];                        // ["a", "b", "c", "d", "e"]
 ```
 
+`for of` implemetation for `Object` 
+
+```js
+Object.prototype[Symbol.iterator] = function* () {
+    for (const [key, value] of Object.entries(this)) {
+          yield { key, value };
+    }
+ };
+for (const { key, value } of { a: 1, b: 2, c: 3 }) {
+  console.log(key, value);
+}
+```
+
 Task queue:
 
 ```js
@@ -82,6 +95,32 @@ function scheduler(task) {
 - `await`can return the resolve/reject value of Promise
 
 Implement of async/await
+
+```js
+function run(genFunc) {
+        let ite = genFunc();
+        return new Promise((res, rej) => {
+          const recursion = (val = null) => {
+            try {
+              var { done, value } = ite.next(val);
+            } catch (err) {
+              rej(err);
+            }
+            if (!done) {
+              Promise.resolve(value).then((val) => {
+                recursion(val);
+              });
+              //}
+            }
+            return res(value);
+          };
+          recursion();
+        });
+      }
+      let r = run(myGenerator);
+```
+
+Bable:
 
 ```js
 //mock async function

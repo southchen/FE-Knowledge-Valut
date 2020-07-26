@@ -1,3 +1,5 @@
+[toc]
+
 # Higher Order Function
 
 In JS, the funciton is the first-class citizens. Same as oridnary object/variable it can be:
@@ -196,5 +198,20 @@ multi(2,3,4)//24
             : currying(fn.bind(this, ...args), length - args.length);
         };
       }
+```
+
+## Thunk
+
+call by name
+
+```js
+// original version wiht multiple arguments
+fs.readFile(fileName, callback);
+
+// Thunk, with single argument
+var readFileThunk = Thunk(fileName);
+readFileThunk(callback);
+
+var Thunk = (fileName)=>(callback)=> fs.readFile(fileName, callback); 
 ```
 
