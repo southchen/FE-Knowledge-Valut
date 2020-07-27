@@ -104,14 +104,12 @@ if (!Array.prototype.reduce) {
         throw new TypeError( callback +
           ' is not a function');
       }
-      // 1. Let O be ? ToObject(this value).
+
       var o = Object(this);
-      // 2. Let len be ? ToLength(? Get(O, "length")).
       var len = o.length >>> 0; 
-      // Steps 3, 4, 5, 6, 7      
+  
       var k = 0; 
       var value;
-
       if (arguments.length >= 2) {
         value = arguments[1];
       } else {
@@ -119,33 +117,18 @@ if (!Array.prototype.reduce) {
           k++; 
         }
 
-        // 3. If len is 0 and initialValue is not present,
-        //    throw a TypeError exception.
         if (k >= len) {
           throw new TypeError( 'Reduce of empty array ' +
             'with no initial value' );
         }
         value = o[k++];
       }
-
-      // 8. Repeat, while k < len
       while (k < len) {
-        // a. Let Pk be ! ToString(k).
-        // b. Let kPresent be ? HasProperty(O, Pk).
-        // c. If kPresent is true, then
-        //    i.  Let kValue be ? Get(O, Pk).
-        //    ii. Let accumulator be ? Call(
-        //          callbackfn, undefined,
-        //          « accumulator, kValue, k, O »).
         if (k in o) {
           value = callback(value, o[k], k, o);
         }
-
-        // d. Increase k by 1.      
         k++;
       }
-
-      // 9. Return accumulator.
       return value;
     }
   });
@@ -215,3 +198,51 @@ readFileThunk(callback);
 var Thunk = (fileName)=>(callback)=> fs.readFile(fileName, callback); 
 ```
 
+## Function caching
+
+### Memoize
+
+```JS
+_.memoize.Cache = WeakMap;
+function memoize(func, resolver) {
+  if (
+    typeof func != "function" ||
+    (resolver != null && typeof resolver != "function")
+  ) {
+    throw new TypeError(FUNC_ERROR_TEXT);
+  }
+  var memoized = function () {
+    var args = arguments,
+      key = resolver ? resolver.apply(this, args) : args[0],
+      cache = memoized.cache;
+    if (cache.has(key)) {
+      return cache.get(key);
+    }
+    var result = func.apply(this, args);
+    memoized.cache = cache.set(key, result) || cache;
+    return result;
+  };
+  memoized.cache = new (memoize.Cache || MapCache)();
+  return memoized;
+}
+```
+
+
+
+```js
+function memoize(fn) {
+  let isCalculated = false;
+  let lastResult;
+  return function memoizedFn() {
+    if (isCalculated) {
+      return lastResult;
+    }
+    let result = fn();
+    lastResult = result;
+    isCalculated = true;
+    return result;
+  };
+}
+```
+
+LRU（least recently used）cache
