@@ -2,7 +2,7 @@
 
 # Higher Order Function
 
-In JS, the funciton is the first-class citizens. Same as oridnary object/variable it can be:
+In JS, the function is the first-class citizens. Same as ordinary object/variable it can be:
 
 * passed into a function as argument
 * returned from a function as the result statement
@@ -12,11 +12,11 @@ In JS, the funciton is the first-class citizens. Same as oridnary object/variabl
 debounce focus on the last trigger event. clear the current timer when the next call back function was created.
 
 ```js
-const debounce = (func) => {
+const debounce = (f,wait) => {
 	let timer;
     return function (e) {
     	clearTimeout(timer);
-    	timer = setTimeout(() => func(e), 1000);
+    	timer = setTimeout(() => f(e), wait);
     };
 };
 function fn(e) {
@@ -34,21 +34,18 @@ throttle focus on the delay time and when was the first time the event was trigg
 Normally the events are consecutive like scrolling, resizing and mouse-moving
 
 ```js
- function boo() {
-        console.log('scroll');
-      }
-const throttle = (fn) => {
-    let flag = true;
-    return function (args) {
-          if (!flag) return;
-          if (flag) fn(args);
-          flag = false;
-          setTimeout(() => {
-            flag = true;
-          }, 3000);
-   };
-};
-const wrappedBoo = throttle(boo);
+function boo() {console.log('scroll')}
+function throttle (f, wait) {
+  let timer
+  return (...args) => {
+    if (timer) { return }
+    timer = setTimeout(() => {
+      f(...args)
+      timer = null
+    }, wait)
+  }
+}
+const wrappedBoo = throttle(boo,2000);
 document.addEventListener('scroll',wrappedBoo);
 //a trap here the scroll event was property of document not the body element
 //or window can also listen scrolling thanks to evet bubbling
@@ -58,9 +55,7 @@ A example from MDN:
 
 ```js
 (function() {
-
   window.addEventListener("resize", resizeThrottler, false);
-
   var resizeTimeout;
   function resizeThrottler() {
     // ignore resize events as long as an actualResizeHandler execution is in the queue
@@ -68,7 +63,6 @@ A example from MDN:
       resizeTimeout = setTimeout(function() {
         resizeTimeout = null;
         actualResizeHandler();
-     
        // The actualResizeHandler will execute at a rate of 15fps
        }, 66);
     }
@@ -82,15 +76,9 @@ A example from MDN:
 }());
 ```
 
+## Array.prototype
 
-
-
-
-
-
-## Array.prototype.reduce()
-
-Polyfill
+MDN polyfill:
 
 ```js
 if (!Array.prototype.reduce) {
@@ -133,6 +121,135 @@ if (!Array.prototype.reduce) {
     }
   });
 }
+```
+
+Simplified array.prototype methods:
+
+`every()`
+
+```js
+// array.every(function(currentValue, index, arr), thisArg)
+Array.prototype.myEvery = function myEvery(fn, thisArg) {
+  const O = Object(this);
+  const length = O.length >>> 0;
+  const T = thisArg;
+  let k = 0;
+  while (k < length) {
+    let kValue;
+    if (k in O) {
+      kValue = O[k];
+    }
+    if (!fn.call(T, kValue, k, O)) return false;
+    k++;
+  }
+  return true;
+}
+```
+
+```js
+//  array.some(function(currentValue, index, arr), thisArg)
+Array.prototype.mySome =function mySome(fn, thisArg) {
+  const O = Object(this);
+  const T = thisArg;
+  const length = O.length >>> 0;
+  let k = 0;
+  while (k < length) {
+    let kValue;
+    if (k in O) kValue = O[k];
+    if (fn.call(T, kValue, k, O)) return true;
+    k++;
+  }
+  return false;
+}
+```
+
+```js
+Array.prototype.myFilter = function (fn, thisArg) {
+  let newArr = [];
+  const O = Object(this);
+  const T = thisArg;
+  const length = O.length >>> 0;
+  let k = 0;
+  let kValue;
+  while (k < length) {
+    if (k in O) kValue = O[k];
+    if (fn.call(T, kValue, k, O)) newArr.push(kValue);
+    k++;
+  }
+  return newArr;
+};
+```
+
+```js
+Array.prototype.myMap = function (fn, thisArg) {
+  let newArr = [];
+  const O = Object(this);
+  const T = thisArg;
+  const length = O.length >>> 0;
+  let k = 0;
+  let kValue;
+  while (k < length) {
+    if (k in O) kValue = O[k];
+    let result = fn.call(T, kValue, k, O);
+    newArr.push(result);
+    k++;
+  }
+  return newArr;
+};
+```
+
+version1:
+
+```js
+Array.prototype.myReduce = function (fn, initValue) {
+  if (initValue != undefined) {
+      //path the initValue as the first argument
+    this.unshift(initValue);
+  }
+  const O = Object(this);
+  const length = O.length >>> 0;
+  let kValue;
+    //init res with the initValue
+  let res = O[0];
+  let k = 1;
+  while (k < length) {
+    if (k in O) kValue = O[k];
+      //the key logic of reduce()
+      //update the current res with previous res
+    res = fn(res, kValue, k, O);
+    k++;
+  }
+    //restore the array
+  this.shift();
+  return res;
+};
+```
+
+version2:
+
+```js
+Array.prototype.myreduce = function (callback /*, initialValue*/) {
+  let newArr = Object(this);
+  let len = newArr.length >>> 0;
+  let initialValue,
+    k = 0;
+  if (arguments.length >= 2) {
+    initialValue = arguments[1];
+  } else {
+    while (k < len && !(k in newArr)) k++;
+    if (k >= len)
+      throw new TypeError('Reduce of empty array with no initial value');
+    initialValue = newArr[k++];
+  }
+
+  for (let i = k; i < len; i++) {
+    if (i in newArr) {
+      initialValue = callback(initialValue, newArr[i], i, newArr);
+    }
+  }
+  return initialValue;
+};
+
 ```
 
 
