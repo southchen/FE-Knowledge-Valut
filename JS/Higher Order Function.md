@@ -125,10 +125,24 @@ if (!Array.prototype.reduce) {
 
 Simplified array.prototype methods:
 
-`every()`
+```js
+Array.prototype.myForEach = function myForEach(fn, thisArg) {
+  const T = thisArg;
+  const O = Object(this);
+  const len = O.length;
+  let k = 0;
+  let kValue;
+  while (k < len) {
+    if (k in O) kValue = O[k];
+    fn.call(T, kValue, k, O);
+    k++;
+  }
+}
+```
+
+array.every(function(currentValue, index, arr), thisArg)
 
 ```js
-// array.every(function(currentValue, index, arr), thisArg)
 Array.prototype.myEvery = function myEvery(fn, thisArg) {
   const O = Object(this);
   const length = O.length >>> 0;
@@ -146,8 +160,9 @@ Array.prototype.myEvery = function myEvery(fn, thisArg) {
 }
 ```
 
+array.some(function(currentValue, index, arr), thisArg)
+
 ```js
-//  array.some(function(currentValue, index, arr), thisArg)
 Array.prototype.mySome =function mySome(fn, thisArg) {
   const O = Object(this);
   const T = thisArg;
@@ -182,19 +197,22 @@ Array.prototype.myFilter = function (fn, thisArg) {
 
 ```js
 Array.prototype.myMap = function (fn, thisArg) {
-  let newArr = [];
   const O = Object(this);
   const T = thisArg;
   const length = O.length >>> 0;
+  let A = new Array(length);
   let k = 0;
   let kValue;
   while (k < length) {
-    if (k in O) kValue = O[k];
+    if (k in O) { 
+        kValue = O[k];
     let result = fn.call(T, kValue, k, O);
-    newArr.push(result);
+     A[k]=result
+    }
     k++;
   }
-  return newArr;
+  newArr.length=length;//deal with sparse array
+  return A;
 };
 ```
 
