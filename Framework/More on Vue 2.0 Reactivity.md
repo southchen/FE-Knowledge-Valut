@@ -71,7 +71,6 @@ import {
 } from './util.js'
 
 const arrayKeys = Object.getOwnPropertyNames(arrayMethods)
-
 /**
  * Observer 类会附加到每一个被侦测的 object 上。
  * 一旦被附加上，Observer 会将 object 的所有属性转换为 getter/setter 的形式
@@ -84,7 +83,6 @@ export default class Observer {
     this.dep = new Dep()
       //use '__ob__' to point 
     def(value, '__ob__', this)
-
     if (Array.isArray(value)) {
       const augment = hasProto 
         ? protoAugment 
@@ -105,14 +103,12 @@ export default class Observer {
       defineReactive(obj, keys[i], obj[keys[i]])
     }
   }
-
   observeArray (items) {
     for (let i = 0, l = items.length; i < l; i++) {
       observe(items[i])
     }
   }
 }
-
 /**
  * 尝试为 value 创建一个 Observer 实例，
  * 如果创建成功直接返回新创建的 Observer实例。
@@ -130,7 +126,6 @@ export function observe (value, asRootData) {
   }
   return ob
 }
-
 function defineReactive (data, key, val) {
   let childOb = observe(val)
   let dep = new Dep()
@@ -219,3 +214,12 @@ export function del (target, key) {
 }
 ```
 
+仔细阅读Observer相关的代码，我们会发现，**dep实例化的地方有两处**：
+ 一处是在defineReactive函数里，每次调用这个函数的时候都会创建一个新的Dep实例，存在在getter/setter闭包函数的作用域链上，**是为对象属性服务的**。在Watcher获取属性的值的时候收集订阅者，在设置属性值的时候发布更新。
+ 另一处是在observe函数中，此时的dep挂在被observe的数据的__ obj__属性上，**他是为对象或数组服务的**，在Watcher获取属性的值的时候，如果值被observe后返回observer对象（对象和数组才会返回observer），那么就会在此时收集订阅者，在对象或数组增删元素时调用$set等api时发布更新的；
+
+Dep实例有两种实例：
+ *第一种：在observe方法里生成的，用来给被观察的对象收集订阅者和发布更新，挂在对象的__ ob__对象上，通常在defineReactive函数里的getter函数里调用childOb.dep.depend()来收集依赖，在vm.$set/Vue.set和vm.$delete/Vue.delete这些api中调用来发布更新。
+ *第二种：在defineReactive函数里，是用来set/get数据时收集订阅者和发布更新的，保存在getter/setter闭包函数的作用域上。set数据时收集依赖，get数据时发布更新。
+
+https://www.jianshu.com/p/1032ecd62b3a
