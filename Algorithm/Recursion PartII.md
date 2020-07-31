@@ -1,4 +1,4 @@
-# Recursion PartII
+# Recursion Part II
 
 ## Bubble sorting
 
@@ -18,11 +18,11 @@ function recurBubble(arr) {
 }
 ```
 
-## Tail recursion & curring
+## Tail recursion & currying
 
 <img src='https://assets.leetcode.com/uploads/2019/01/26/card_recursion_tail.png'>
 
-Example fibonacci
+Example Fibonacci
 
 **Before**
 
@@ -39,7 +39,7 @@ const fibonacci = (n) => {
 
 **After**
 
-* in order to use tail recursion, the arugments was tweaked
+* in order to use tail recursion, the arguments was tweaked
   * init the function with first two result: r1:1 and r2:1;
   * one parameter was to store the cur number r1;
   * one parameter was to store the previous result r2 (sum of f(n-1) and f(n-2), so no need to do the  fibonacci(n-1) + fibonacci(n - 2) inside the function
@@ -88,10 +88,10 @@ Example: Random given recurrence
 `function: f(n) = 3 * f(n-1) + f(n - 2) + f(n - 3) - 4; f(0) = 2; f(1) = 2; f(2) = 3;`
 
 ```js
-function recurrence(n){
-    if(n<=1) return 2;
-    if(n===2) return 3;
-    return 3*f(n-1)+f(n-2)+f(n-3)-4;
+function recurrence(n) {
+  if (n <= 1) return 2;
+  if (n === 2) return 3;
+  return 3 * recurrence(n - 1) + recurrence(n - 2) + recurrence(n - 3) - 4;
 }
 recurrence(5)
 ```
@@ -100,12 +100,14 @@ recurrence(5)
 function tailRecurrencey(n, r1, r2, r3) {
   if (n <= 1) return r1;
   if (n === 2) return r2;
-  return tailRecurrencey(n - 1, r1, r2, r3, 3 * r3 + r2 + r1 - 4);
+    //n>=3
+    //r2->r1, r3->r2 r3->recurrence(r3)
+  return tailRecurrencey(n - 1, r2,r3,3* r3 + r2 + r1 - 4);
 }
-console.log(tailRecurrencey(5,  2, 3, 9));
+tailRecurrencey(5,  2, 3, 9);
 ```
 
-Sometimes it's not natural to call a function that takes a second parameter which is seems not that related. Currying can transfer a function that takes multiple parameters to a function takes single parameter every time until it accumulated parameters number meets the requirement it returns the anwser.
+Sometimes it's not natural to call a function that takes a second parameter which is seems not that related. Currying can transfer a function that takes multiple parameters to a function takes single parameter every time until it accumulated parameters number meets the requirement it returns the answer.  
 
 ```js
 function tailFactorial(n, res) {
