@@ -30,22 +30,16 @@ function initComputed(vm, computed) {
     // component-defined computed properties are already defined on the
     // component prototype. We only need to define computed properties defined
     // at instantiation here.
-    if (!(key in vm)) {
+    if (!(key in vm)) {//组件的计算属性在模块加载的时候已经被定义在了原型上面了
     //因为 computed 属性是直接挂载到实例对象中的，所以在定义之前需要判断对象中是否已经存在重名的属性，如果 key 不是 vm 的属性，则调用 defineComputed(vm, key, userDef)
       defineComputed(vm, key, userDef);
         //eg. computed:{price:function(){this.unit}}
         //define之后，有vm.price
     } else if (process.env.NODE_ENV !== 'production') {
       if (key in vm.$data) {
-        warn(
-          'The computed property "' + key + '" is already defined in data.',
-          vm
-        );
+     
       } else if (vm.$options.props && key in vm.$options.props) {
-        warn(
-          'The computed property "' + key + '" is already defined as a prop.',
-          vm
-        );
+      
       }
     }
   }
@@ -171,6 +165,8 @@ init时，遍历computed中属性，创建watcher实例；对于computed watcher
 render函数渲染组件时，触发computed的getter，调用watcher.evaluate(); 
 
 Dep.target指向当前调用函数，不为空时调用该watcher的depend方法，并返回该watcher的value
+
+watcher函数对象的evaluate()和depend()对象都是为计算属性量身定制的,也就是说是它独有的，对于evaluate()来说，
 
 ```js
 /**
