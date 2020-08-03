@@ -513,7 +513,7 @@ Watcher.prototype.update = function update() {
  */
 Watcher.prototype.run = function run() {
   if (this.active) {
-    var value = this.get();
+    var value = this.get(); //触发render watcher ——> update component
     if (
       value !== this.value ||
       // Deep watchers and watchers on Object/Arrays should fire even
