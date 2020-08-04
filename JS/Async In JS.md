@@ -228,3 +228,41 @@ let re1= await async2()
  console.log(re1)
 ```
 
+Sleep function
+
+```js
+const sleep = ms => new Promise(
+  resolve => setTimeout(resolve, ms)
+);
+await sleep(1000);
+```
+
+```js
+// Sequential Code (~3.0s)
+sleep(1000)
+  .then(() => sleep(1000));
+  .then(() => sleep(1000));
+
+// Concurrent Code (~1.0s)
+Promise.all([ sleep(1000), sleep(1000), sleep(1000) ]);
+```
+
+task queue
+
+```js
+ function queue(arr) {
+        let p = Promise.resolve();
+        arr.forEach((element) => {
+          p = p.then(() => {
+            console.log(element);
+            //do sth
+            return new Promise((res) => {
+              setTimeout(() => {
+                res();
+              }, 1000);
+            });
+          });
+        });
+      }
+queue(['a', 'b', 'c']);
+```

@@ -525,6 +525,7 @@ for (let i = 1; i < amount + 1; i++) {
     // 从1开始可以简化运算
     if (i - coins[j - 1] >= 0) {
       // 注意这里是coins[j -1]而不是coins[j]
+        //transfer 选的方法个数+不选的方法个数
       dp[i][j] = dp[i][j - 1] + dp[i - coins[j - 1]][j]; // 由于可以重复使用硬币所以这里是j不是j-1
     } else {
       dp[i][j] = dp[i][j - 1];
