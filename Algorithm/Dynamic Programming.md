@@ -71,10 +71,18 @@ Template
 var rob = function(nums) {
     let length = nums.length;
     if(length===0) return 0;
+    //dp[i]到第i家的最高value
+    //dp长度为nums长度+1
     let dp= Array(length+1);
+    //init 前两个
+    //选0家，0
+    //选第一家，nums[0]
     dp[0]=0;
     dp[1]=nums[0];
     for(let i = 2;i<=length;i++){
+        //choices:
+        //选择第i家，前一个选择的状态，dp[i-2]加上当前价值
+        //不选，前一家的状态dp[i-1]
         dp[i]= Math.max(dp[i-1],dp[i-2]+nums[i-1]);
     }
     return dp.pop();
@@ -97,6 +105,149 @@ var climbStairs = function (n) {
 
 ## Two dimensional array
 
+#### [213. House Robber II](https://leetcode-cn.com/problems/house-robber-ii/)
+
+one dimension ->two dimension
+
+拆分成两个问题，每个子问题类似于198题；
+
+1:选第一家不选最后家时的答案
+
+2.选最后一家不选第一家时的答案
+
+取最大
+
+```js
+var rob = function(nums) {
+    let n = nums.length;
+    if(n === 0) return 0;
+    if(n === 1) return nums[0];
+    //max(选第一家不选最后一家，选最后一家不选第一家)
+    return Math.max(help(nums.slice(0, n - 1)), help(nums.slice(1, n)))
+};
+
+function help(nums) {
+    //每个问题是一个dp问题
+    const dp = [];
+    //空出前两个
+    dp[0] = 0;
+    dp[1] = 0;
+    //i从2开始
+    for (let i = 2; i < nums.length + 2; i++) {
+        //similar with 198，index minus 2
+        dp[i] = Math.max(dp[i-2] + nums[i-2], dp[i-1]);
+    }
+    return dp[nums.length + 1];
+};
+
+```
+
+#### [337. House Robber III](https://leetcode-cn.com/problems/house-robber-iii/)
+
+递归
+
+```js
+var rob = function(root) {
+    const traverse(node){
+        if(!node) return[0,0]
+      const left=traverse(node.left)
+      const right =traverse(node.right);
+      //抢 当前节点+前2个抢
+      let robed=node.val+left[1]+right[1]
+    //不抢 前一个状态的最大值，可抢也可不抢
+        let notRobed = Math.max(left[0],left[1])+Math.max(right[0],right[1])
+    }
+    let [robed,notRobed]=traverse(root)
+    return Math.max(robed,notRobed)
+};
+```
+
+DP, 遍历二叉树，做选择
+
+两个变量共同决定一个状态：
+
+* 1、代表不同子树的 root 节点
+* 2、是否打劫了 root。
+
+dp 不用数组，用map 代替。key是当前子树的root节点，value是存放两个状态的 res 数组。
+选择：
+
+* 没打劫根节点，则左右子树的根节点可打劫可不打劫：
+  res[0] = 左子树的两个状态的较大值 + 右子树的两个状态的较大值。
+* 打劫了根节点，则左右子树的根节点不能打劫：
+  res[1] = root.val + 左子树的 [0] 状态 + 右子树的 [0] 状态。
+
+```js
+const rob = (root) => {
+  const dp = new Map();
+  const helper = (root) => {
+    if (root == null) return [0, 0]; // 递归的出口
+    const left = helper(root.left);
+    const right = helper(root.right);
+    if (!dp.has(root)) {
+      // 还没遍历过该节点
+      dp.set(root, [0, 0]); // 在map中添加该节点对应的res数组
+    }
+    const res = dp.get(root); // 获取该节点对应的res数组
+    res[0] = Math.max(left[0], left[1]) + Math.max(right[0], right[1]);
+    res[1] = root.val + left[0] + right[0]; // 在map中记录当前子树的两个状态
+    return res; // 返回出这两个状态，供父节点参考
+  };
+  const res = helper(root); // 递归的入口
+  return Math.max(res[0], res[1]);
+};
+```
+
+#### [746. Min Cost Climbing Stairs](https://leetcode-cn.com/problems/min-cost-climbing-stairs/)
+
+第 i 级台阶是第 i-1 级台阶的阶梯顶部
+
+ 踏上第 i 级台阶花费 cost[i] ，直接迈一大步跨过而不踏上去则不用花费。
+
+ 楼梯顶部在数组之外，如果数组长度为 len，那么楼顶就在下标为 len
+
+```js
+//dp[i-1] + cost[i] or dp[i-2]+cost[i]=>dp[i] = min(dp[i-2], dp[i-1]) + cost[i]
+let minCostClimbingStairs = function (cost) {
+  //push 0 to init
+  cost.push(0);
+  let dp = [],
+    n = cost.length;
+  //init dp with base case
+  // 第 0 级 cost[0] 种方案
+  dp[0] = cost[0];
+  // 第 1 级，有两种情况,都为cost[1]
+  // 1：分别踏上第0级与第1级台阶，花费cost[0] + cost[1]
+  // 2：直接从地面开始迈两步直接踏上第1级台阶，花费cost[1]
+  dp[1] = cost[1];
+  //从第二个开始遍历
+  for (let i = 2; i < n; i++) {
+    dp[i] = Math.min(dp[i - 2], dp[i - 1]) + cost[i];
+  }
+  console.log(dp);
+  return dp[n - 1];
+};
+```
+
+
+
+```js
+let minCostClimbingStairs = function (cost) {
+  let n = cost.length,
+    n1 = cost[0],
+    n2 = cost[1];
+  for (let i = 2; i < n; i++) {
+    let tmp = n2;
+    n2 = Math.min(n1, n2) + cost[i];
+    n1 = tmp;
+  }
+  return Math.min(n1, n2);
+};
+
+```
+
+
+
 #### [72. Edit Distance](https://leetcode-cn.com/problems/edit-distance/)
 
 <img src="https://pic.leetcode-cn.com/501e2518592c5100ca7863f4ebcf0b1c45c72f6b7b5e052087e6cda371cba462-file_1567564774431" style="zoom:50%"/>
@@ -104,10 +255,10 @@ var climbStairs = function (n) {
 
 
 * `dp[i-1][j]` : 删除
-  * 直接把 s[i] 这个字符删掉，前移 i，继续跟 j 对比，操作数加一	
+  * 直接把 s[i] 这个字符删掉，i 需要指向删除后，最后面的数，即前移i，继续跟 j 对比，操作数加一	
 
 * `dp[i][j-1]` : 插入
-  * 在 s1[i] 插入一个和 s2[j] 一样的字符 ，那么 s2[j] 就被匹配了，前移 j，继续跟 i 对比，操作数加一	
+  * 在 s1[i] 插入一个和 s2[j] 一样的字符 ，s2[j] 被匹配了，前移 j，继续跟 i 对比，操作数加一	
 * `dp[i-1][j-1]` : 替换
   * 把 s1[i] 替换成 s2[j]，匹配； 同时前移 i，j 继续对比；操作数加一
 
@@ -137,7 +288,7 @@ let minDistance = (word1, word2)=> {
                 }
             }else{
                 //i==0 ||j==0
-                //即有一单词为0,直接返回i+j
+                //即有一单词为0，到头,直接返回i+j（0+i或j+0）即还有长度的数组每个都删除
                 dp[i][j] = i + j
             }
         }
