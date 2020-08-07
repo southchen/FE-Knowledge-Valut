@@ -4,22 +4,20 @@
 
 ## New operator
 
-`let a = new ACon(args)` :point_right:  `let a =_new(ACon,args)`
+`let a = new ACon(args)` :point_right: `let a =_new(ACon,args)`
 
 ```js
-
 function _new(Ctor, ...args) {
-     let obj = Object.create(Ctor.prototype);
-    //bind the 'this'; obtain the result
+  let obj = Object.create(Ctor.prototype);
+  //bind the 'this'; obtain the result
   let result = Ctor.call(obj, ...args);
   return result instanceof Object ? result : obj;
 }
-
 ```
 
 ## Instanceof operator
 
-object instanceof constructor :point_right:  myInstanceOf(leftVaule, rightVaule) 
+object instanceof constructor :point_right: myInstanceOf(leftVaule, rightVaule)
 
 ```
 
@@ -33,7 +31,7 @@ object instanceof constructor :point_right:  myInstanceOf(leftVaule, rightVaule)
 
 ## Object.create()
 
-let sub = Object.create(Sup.prototype) 
+let sub = Object.create(Sup.prototype)
 
 let sub = myCreate(Sup.prototype)
 
@@ -44,8 +42,6 @@ function myCreate(_proto){
 	return new F()
 }
 ```
-
-
 
 ## Inheritance
 
@@ -80,10 +76,7 @@ Function.prototype.myApply = function (thisArg = window, ...args) {
   delete thisArg[foo];
   return result;
 };
-
 ```
-
-
 
 ## Function.prototype.bind()
 
@@ -93,10 +86,6 @@ let boo = foo.bind(thisArg,args)
 
 ```
 
-<<<<<<< HEAD
-```
-//  Yes, it does work with `new (funcA.bind(thisArg, args))`
-=======
 work with `new (funcA.bind(thisArg, args))`
 
 ```js
@@ -124,7 +113,7 @@ if (!Function.prototype.bind) (function(){
 
     if (this.prototype) {
       // Function.prototype doesn't have a prototype property
-      fNOP.prototype = this.prototype; 
+      fNOP.prototype = this.prototype;
     }
     fBound.prototype = new fNOP();
 
@@ -135,64 +124,59 @@ if (!Function.prototype.bind) (function(){
 
 ## Currying
 
-<<<<<<< HEAD
-=======
 ```js
 Function.prototype.memoized = function () {
-        let key = JSON.stringify(arguments);
-        this._cache = this.cache || {};
-        this._cache[key] = this._cache[key] || this.apply(this, arguments);
-        return this._cache[key];
-      };
-      Function.prototype.memoize = function () {
-        let fn = this;
-        if (fn.length === 0 || fn.length > 1) {
-          return;
-        }
-        return function () {
-          return fn.memoized.apply(fn, arguments);
-        };
-      };
+  let key = JSON.stringify(arguments);
+  this._cache = this.cache || {};
+  this._cache[key] = this._cache[key] || this.apply(this, arguments);
+  return this._cache[key];
+};
+Function.prototype.memoize = function () {
+  let fn = this;
+  if (fn.length === 0 || fn.length > 1) {
+    return;
+  }
+  return function () {
+    return fn.memoized.apply(fn, arguments);
+  };
+};
 ```
 
 Function memoization
 
 ```js
 Function.prototype.memoized = function () {
-        let key = JSON.stringify(arguments);
-        this._cache = this.cache || {};
-        this._cache[key] = this._cache[key] || this.apply(this, arguments);
-        return this._cache[key];
-      };
-      Function.prototype.memoize = function () {
-        let fn = this;
-        if (fn.length === 0 || fn.length > 1) {
-          return;
-        }
-        return function () {
-          return fn.memoized.apply(fn, arguments);
-        };
-      };
+  let key = JSON.stringify(arguments);
+  this._cache = this.cache || {};
+  this._cache[key] = this._cache[key] || this.apply(this, arguments);
+  return this._cache[key];
+};
+Function.prototype.memoize = function () {
+  let fn = this;
+  if (fn.length === 0 || fn.length > 1) {
+    return;
+  }
+  return function () {
+    return fn.memoized.apply(fn, arguments);
+  };
+};
 ```
 
 Function Compose
 
 ```js
-   function compose(...fns) {
-        let start = fns.lenght - 1;
-        return function (...args) {
-          let i = start;
-          let result = fns[start].apply(this, args);
-          while (i--) {
-            result = fns[i].call(this, result);
-          }
-          return result;
-        };
-      }
+function compose(...fns) {
+  let start = fns.lenght - 1;
+  return function (...args) {
+    let i = start;
+    let result = fns[start].apply(this, args);
+    while (i--) {
+      result = fns[i].call(this, result);
+    }
+    return result;
+  };
+}
 ```
-
->>>>>>> 6ef3d5a835b34f86e658f1b9f1bbdef8bcf3618a
-
 
 ## Encapsulate a draggable element
 
@@ -207,42 +191,40 @@ Function Compose
     }
   </style>
   <body>
-  <div id="xxx"></div>
-    <script >
-        const Draggable = function (el) {
-  this.el = el;
-  this.init();
-};
-Draggable.prototype.init = function () {
-  this.el.addEventListener('mousedown', (e) => {
-    this.dragging = true;
-    this.position = [e.clientX, e.clientY];
-    console.log(this.dragging);
-    this.bind();
-  });
-};
-Draggable.prototype.bind = function () {
-  document.addEventListener('mousemove', (e) => {
-    if (this.dragging === false) return null;
-    const x = e.clientX;
-    const y = e.clientY;
-    const deltaX = x - this.position[0];
-    const deltaY = y - this.position[1];
-    const left = parseInt(this.el.style.left || 0);
-    const top = parseInt(this.el.style.top || 0);
-    this.el.style.left = left + deltaX + 'px';
-    this.el.style.top = top + deltaY + 'px';
-    this.position = [x, y];
-  });
-  document.addEventListener('mouseup', (e) => {
-    this.dragging = false;
-  });
-};
-const xxx = document.querySelector('#xxx');
-let x = new Draggable(xxx);
-      </script>
+    <div id="xxx"></div>
+    <script>
+      const Draggable = function (el) {
+        this.el = el;
+        this.init();
+      };
+      Draggable.prototype.init = function () {
+        this.el.addEventListener('mousedown', (e) => {
+          this.dragging = true;
+          this.position = [e.clientX, e.clientY];
+          console.log(this.dragging);
+          this.bind();
+        });
+      };
+      Draggable.prototype.bind = function () {
+        document.addEventListener('mousemove', (e) => {
+          if (this.dragging === false) return null;
+          const x = e.clientX;
+          const y = e.clientY;
+          const deltaX = x - this.position[0];
+          const deltaY = y - this.position[1];
+          const left = parseInt(this.el.style.left || 0);
+          const top = parseInt(this.el.style.top || 0);
+          this.el.style.left = left + deltaX + 'px';
+          this.el.style.top = top + deltaY + 'px';
+          this.position = [x, y];
+        });
+        document.addEventListener('mouseup', (e) => {
+          this.dragging = false;
+        });
+      };
+      const xxx = document.querySelector('#xxx');
+      let x = new Draggable(xxx);
+    </script>
   </body>
 </html>
-
 ```
-
