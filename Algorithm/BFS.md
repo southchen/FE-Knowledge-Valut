@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 [TOC]
 
 # BFS
@@ -13,21 +14,21 @@ DFS 实际上是靠递归的堆栈记录⾛过的路径，你要找到最短路
 径，肯定得把⼆叉树中所有树杈都探索完才能对⽐出最短的路径有多⻓对不
 对？⽽ BFS 借助队列做到⼀次⼀步「⻬头并进」，是可以在不遍历完整棵
 树的条件下找到最短距离的。
-BFS算法套路框架
+BFS 算法套路框架
 105
 
 using queue
 
 ## Template
 
-* function BFS takes two parameters target/end and start
-* build a queue to maintain the data
-* build an array to sotre visited data if needed
-* push the start, init the step
-* check if it reaches the target 
-  * if not, push the surrounding element into the queue
-  * if so return with the step
-* update the step
+- function BFS takes two parameters target/end and start
+- build a queue to maintain the data
+- build an array to sotre visited data if needed
+- push the start, init the step
+- check if it reaches the target
+  - if not, push the surrounding element into the queue
+  - if so return with the step
+- update the step
 
 ## Leetcode
 
@@ -40,33 +41,32 @@ The minimum depth is the number of nodes along the shortest path from the root n
 Note: A leaf is a node with no children.
 
 ```js
-var minDepth = function(root) {
-    if (!root) return 0
+var minDepth = function (root) {
+  if (!root) return 0;
 
-    let q = [], step = 1
-    q.push(root)
+  let q = [],
+    step = 1;
+  q.push(root);
 
-    while(q.length > 0) {
-        let len = q.length
-        for(let i=0; i< len; i++) {
-            let curr = q.shift()
-            if (curr.left === null && curr.right === null) return step
+  while (q.length > 0) {
+    let len = q.length;
+    for (let i = 0; i < len; i++) {
+      let curr = q.shift();
+      if (curr.left === null && curr.right === null) return step;
 
-            if (curr.left !== null) {
-                q.push(curr.left)
-            }
-            if (curr.right !== null) {
-                q.push(curr.right)
-            }
-        }
-        step ++ 
+      if (curr.left !== null) {
+        q.push(curr.left);
+      }
+      if (curr.right !== null) {
+        q.push(curr.right);
+      }
     }
+    step++;
+  }
 };
-
 ```
 
 #### [200. Number of Islands](https://leetcode-cn.com/problems/number-of-islands/)
-
 
 Given a 2d grid map of `'1'`s (land) and `'0'`s (water), count the number of islands. An island is surrounded by water and is formed by connecting adjacent lands horizontally or vertically. You may assume all four edges of the grid are all surrounded by water.
 
@@ -84,36 +84,46 @@ Output: 1
 
 ```js
 const numIslands = (grid) => {
-  let count = 0
-  let queue = []
+  let count = 0;
+  let queue = [];
   for (let i = 0; i < grid.length; i++) {
     for (let j = 0; j < grid[0].length; j++) {
       if (grid[i][j] === '1') {
-        count++
-        grid[i][j] = '0' // 做标记，避免重复遍历
-        queue.push([i, j])
-        turnZero(queue, grid)
+        count++;
+        grid[i][j] = '0'; // 做标记，避免重复遍历
+        queue.push([i, j]);
+        turnZero(queue, grid);
       }
     }
   }
-  return count
-}
+  return count;
+};
 function turnZero(queue, grid) {
-  const dirs = [[0, 1], [1, 0], [0, -1], [-1, 0]]
+  const dirs = [
+    [0, 1],
+    [1, 0],
+    [0, -1],
+    [-1, 0],
+  ];
   while (queue.length) {
-    const cur = queue.shift()
+    const cur = queue.shift();
     for (const dir of dirs) {
-      const x = cur[0] + dir[0]
-      const y = cur[1] + dir[1]
-      if (x < 0 || x >= grid.length || y < 0 || y >= grid[0].length || grid[x][y] !== '1') {
-        continue
+      const x = cur[0] + dir[0];
+      const y = cur[1] + dir[1];
+      if (
+        x < 0 ||
+        x >= grid.length ||
+        y < 0 ||
+        y >= grid[0].length ||
+        grid[x][y] !== '1'
+      ) {
+        continue;
       }
-      grid[x][y] = '0'
-      queue.push([x, y])
+      grid[x][y] = '0';
+      queue.push([x, y]);
     }
   }
 }
-
 ```
 
 #### [752. Open the Lock](https://leetcode-cn.com/problems/open-the-lock/)
@@ -142,12 +152,11 @@ var openLock = function (deadends, target) {
   }
   return -1;
 };
-
 ```
 
 #### [133. Clone Graph](https://leetcode-cn.com/problems/clone-graph/)
 
- [102. Binary Tree Level Order Traversal](https://leetcode-cn.com/problems/binary-tree-level-order-traversal/)
+[102. Binary Tree Level Order Traversal](https://leetcode-cn.com/problems/binary-tree-level-order-traversal/)
 
 Using queue and a flag(length) to check if the traversal is completed for one level
 
@@ -157,10 +166,10 @@ var levelOrder = function (root) {
   let queue = [root];
   let res = [];
   while (queue.length > 0) {
-      //record the amount of the nodes in the same level
+    //record the amount of the nodes in the same level
     let length = queue.length;
     let arr = [];
-      //when i ==len-1, completed current level
+    //when i ==len-1, completed current level
     for (let i = 0; i < len; i++) {
       let cur = queue.shift();
       arr.push(cur.val);
@@ -205,8 +214,6 @@ var zigzagLevelOrder = function (root) {
   return res;
 };
 ```
-
-
 
 #### [515. Find Largest Value in Each Tree Row](https://leetcode-cn.com/problems/find-largest-value-in-each-tree-row/)
 
@@ -319,10 +326,10 @@ const numIslands = (grid) => {
   for (let i = 0; i < grid.length; i++) {
     for (let j = 0; j < grid[0].length; j++) {
       if (grid[i][j] === '1') {
-          //遇到 1 就计数 +1 ，开始 BFS 沉岛
+        //遇到 1 就计数 +1 ，开始 BFS 沉岛
         count++;
         grid[i][j] = '0'; // 做标记，避免重复遍历
-          //维护一个队列，遇到 1 就让它的坐标入列
+        //维护一个队列，遇到 1 就让它的坐标入列
         queue.push([i, j]);
         turnZero(queue, grid);
       }
@@ -337,9 +344,9 @@ function turnZero(queue, grid) {
     [0, -1],
     [-1, 0],
   ];
-    //一层层的出列入列，直到没有可以入列的节点，则当前岛屿的所有 1 都转 0 了
+  //一层层的出列入列，直到没有可以入列的节点，则当前岛屿的所有 1 都转 0 了
   while (queue.length) {
-      //节点出列，并考察四个方向，如果是 1 ，将它转为 0 ，并将节点入列
+    //节点出列，并考察四个方向，如果是 1 ，将它转为 0 ，并将节点入列
     const cur = queue.shift();
     for (const dir of dirs) {
       const x = cur[0] + dir[0];
@@ -351,7 +358,7 @@ function turnZero(queue, grid) {
         y >= grid[0].length ||
         grid[x][y] !== '1'
       ) {
-       //如果越界了或遇到 0 ，则跳过，不用转 0
+        //如果越界了或遇到 0 ，则跳过，不用转 0
         continue;
       }
       grid[x][y] = '0';
@@ -360,8 +367,6 @@ function turnZero(queue, grid) {
   }
 }
 ```
-
-
 
 #### [994. Rotting Oranges](https://leetcode-cn.com/problems/rotting-oranges/)
 
@@ -408,13 +413,7 @@ const orangesRotting = (grid) => {
 
 #### [542. 01 Matrix](https://leetcode-cn.com/problems/01-matrix/)
 
-
-
-[LeetCode 1162. As Far from Land as Possible](https://leetcode.com/problems/as-far-from-land-as-possible/) 
-
-
-
-
+[LeetCode 1162. As Far from Land as Possible](https://leetcode.com/problems/as-far-from-land-as-possible/)
 
 传统的 BFS 框架就是从起点开始向四周扩散，遇到终点时停⽌；⽽双向 BFS 则是从起点和终点同时开始扩散，当两边有交集的时候停⽌。
 

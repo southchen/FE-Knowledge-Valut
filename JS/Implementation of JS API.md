@@ -93,8 +93,14 @@ let boo = foo.bind(thisArg,args)
 
 ```
 
+<<<<<<< HEAD
 ```
 //  Yes, it does work with `new (funcA.bind(thisArg, args))`
+=======
+work with `new (funcA.bind(thisArg, args))`
+
+```js
+>>>>>>> 6ef3d5a835b34f86e658f1b9f1bbdef8bcf3618a
 if (!Function.prototype.bind) (function(){
   var ArrayPrototypeSlice = Array.prototype.slice;
   Function.prototype.bind = function(otherThis) {
@@ -129,6 +135,63 @@ if (!Function.prototype.bind) (function(){
 
 ## Currying
 
+<<<<<<< HEAD
+=======
+```js
+Function.prototype.memoized = function () {
+        let key = JSON.stringify(arguments);
+        this._cache = this.cache || {};
+        this._cache[key] = this._cache[key] || this.apply(this, arguments);
+        return this._cache[key];
+      };
+      Function.prototype.memoize = function () {
+        let fn = this;
+        if (fn.length === 0 || fn.length > 1) {
+          return;
+        }
+        return function () {
+          return fn.memoized.apply(fn, arguments);
+        };
+      };
+```
+
+Function memoization
+
+```js
+Function.prototype.memoized = function () {
+        let key = JSON.stringify(arguments);
+        this._cache = this.cache || {};
+        this._cache[key] = this._cache[key] || this.apply(this, arguments);
+        return this._cache[key];
+      };
+      Function.prototype.memoize = function () {
+        let fn = this;
+        if (fn.length === 0 || fn.length > 1) {
+          return;
+        }
+        return function () {
+          return fn.memoized.apply(fn, arguments);
+        };
+      };
+```
+
+Function Compose
+
+```js
+   function compose(...fns) {
+        let start = fns.lenght - 1;
+        return function (...args) {
+          let i = start;
+          let result = fns[start].apply(this, args);
+          while (i--) {
+            result = fns[i].call(this, result);
+          }
+          return result;
+        };
+      }
+```
+
+>>>>>>> 6ef3d5a835b34f86e658f1b9f1bbdef8bcf3618a
 
 
 ## Encapsulate a draggable element
