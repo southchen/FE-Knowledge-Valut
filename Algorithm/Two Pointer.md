@@ -1,4 +1,6 @@
-# leetcode: Two Pointer
+[toc]
+
+# Two Pointer
 
 ### 3 [Longest Substring Without Repeating Characters](https://leetcode-cn.com/problems/longest-substring-without-repeating-characters/)
 
@@ -187,7 +189,7 @@ var threeSumClosest = function (nums, target) {
 };
 ```
 
-####  [42. Trapping Rain Water](https://leetcode-cn.com/problems/trapping-rain-water/)
+### [42. Trapping Rain Water](https://leetcode-cn.com/problems/trapping-rain-water/)
 
 Given n non-negative integers representing an elevation map where the width of each bar is 1, compute how much water it is able to trap after raining.
 
@@ -281,7 +283,7 @@ j++
 };
 ```
 
-#### [18. 4Sum](https://leetcode-cn.com/problems/4sum/)
+### [18. 4Sum](https://leetcode-cn.com/problems/4sum/)
 
 > Given an array nums of n integers and an integer target, are there elements a, b, c, and d in nums such that a + b + c + d = target? Find all unique quadruplets in the array which gives the sum of target.
 >

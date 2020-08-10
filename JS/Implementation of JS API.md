@@ -21,29 +21,18 @@ function _new(Ctor, ...args) {
 
 object instanceof constructor :point_right: myInstanceOf(leftVaule, rightVaule)
 
-```
+### Create
 
-```
-
-### create()
-
+```js
 let sub = Object.create(Sup.prototype)
-
 let sub = myCreate(Sup.prototype)
-
-```
 function myCreate(_proto){
 	function F(){}
 	F.prototype=_proto;
 	return new F()
 }
 ```
-
 ### Inheritance
-
-```
-
-```
 
 ## Function
 
@@ -76,8 +65,8 @@ Function.prototype.myApply = function (thisArg = window, ...args) {
 };
 ```
 
-### .prototype.bind()
 
+### .prototype.bind()
 let boo = foo.bind(thisArg,args)
 
 ```js
@@ -245,8 +234,6 @@ Promise.myRace([o, r, 6]).then((v) => console.log(v));
 
 ````
 
-
-
 ## Encapsulate a draggable element
 
 ```html
@@ -297,3 +284,4 @@ Promise.myRace([o, r, 6]).then((v) => console.log(v));
   </body>
 </html>
 ```
+
