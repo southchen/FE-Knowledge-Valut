@@ -2,38 +2,32 @@
 
 # Implementation of JS API
 
-## New operator
+## Object
 
-`let a = new ACon(args)` :point_right:  `let a =_new(ACon,args)`
+### New operator
+
+`let a = new ACon(args)` :point_right: `let a =_new(ACon,args)`
 
 ```js
-
 function _new(Ctor, ...args) {
-     let obj = Object.create(Ctor.prototype);
-    //bind the 'this'; obtain the result
+  let obj = Object.create(Ctor.prototype);
+  //bind the 'this'; obtain the result
   let result = Ctor.call(obj, ...args);
   return result instanceof Object ? result : obj;
 }
-
 ```
 
-## Instanceof operator
+### Instanceof operator
 
-object instanceof constructor :point_right:  myInstanceOf(leftVaule, rightVaule) 
-
-```
-
-```
-
-## Sleep
+object instanceof constructor :point_right: myInstanceOf(leftVaule, rightVaule)
 
 ```
 
 ```
 
-## Object.create()
+### create()
 
-let sub = Object.create(Sup.prototype) 
+let sub = Object.create(Sup.prototype)
 
 let sub = myCreate(Sup.prototype)
 
@@ -45,17 +39,17 @@ function myCreate(_proto){
 }
 ```
 
-
-
-## Inheritance
+### Inheritance
 
 ```
 
 ```
 
-## Function.prototype.call()
+## Function
 
-## Function.prototype.apply()
+### .prototype.call()
+
+### .prototype.apply()
 
 ```js
 Function.prototype.myCall = function (thisArg = window, ...args) {
@@ -80,17 +74,19 @@ Function.prototype.myApply = function (thisArg = window, ...args) {
   delete thisArg[foo];
   return result;
 };
-
 ```
 
-
-
-## Function.prototype.bind()
+### .prototype.bind()
 
 let boo = foo.bind(thisArg,args)
 
-```
-
+```js
+Function.prototype.myBind=function (thisArg=window,...args){
+	return ()=>{
+        let result=this.call(thisArg,...args)
+        return result;
+    }
+}
 ```
 
 work with `new (funcA.bind(thisArg, args))`
@@ -104,7 +100,6 @@ if (!Function.prototype.bind) (function(){
       // internal IsCallable function
       throw new TypeError('Function.prototype.bind - what is trying to be bound is not callable');
     }
-
     var baseArgs= ArrayPrototypeSlice.call(arguments, 1),
         baseArgsLength = baseArgs.length,
         fToBind = this,
@@ -119,70 +114,136 @@ if (!Function.prototype.bind) (function(){
 
     if (this.prototype) {
       // Function.prototype doesn't have a prototype property
-      fNOP.prototype = this.prototype; 
+      fNOP.prototype = this.prototype;
     }
     fBound.prototype = new fNOP();
-
     return fBound;
   };
 })();
 ```
 
-## Currying
+### Currying
 
 ```js
-Function.prototype.memoized = function () {
-        let key = JSON.stringify(arguments);
-        this._cache = this.cache || {};
-        this._cache[key] = this._cache[key] || this.apply(this, arguments);
-        return this._cache[key];
-      };
-      Function.prototype.memoize = function () {
-        let fn = this;
-        if (fn.length === 0 || fn.length > 1) {
-          return;
-        }
-        return function () {
-          return fn.memoized.apply(fn, arguments);
-        };
-      };
-```
-
-Function memoization
-
-```js
-Function.prototype.memoized = function () {
-        let key = JSON.stringify(arguments);
-        this._cache = this.cache || {};
-        this._cache[key] = this._cache[key] || this.apply(this, arguments);
-        return this._cache[key];
-      };
-      Function.prototype.memoize = function () {
-        let fn = this;
-        if (fn.length === 0 || fn.length > 1) {
-          return;
-        }
-        return function () {
-          return fn.memoized.apply(fn, arguments);
-        };
-      };
-```
-
-Function Compose
-
-```js
-   function compose(...fns) {
-        let start = fns.lenght - 1;
-        return function (...args) {
-          let i = start;
-          let result = fns[start].apply(this, args);
-          while (i--) {
-            result = fns[i].call(this, result);
-          }
-          return result;
+    function currying(fn) {
+        let len = fn.length;
+        let fullArg = [];
+        return function curry(...args) {
+          len -= args.length;
+          fullArg.push(...args);
+          if (len === 0) return fn(...fullArg);
+          return curry;
         };
       }
 ```
+
+### Function memoization
+
+```js
+Function.prototype.memoized = function () {
+  let key = JSON.stringify(arguments);
+  this._cache = this.cache || {};
+  this._cache[key] = this._cache[key] || this.apply(this, arguments);
+  return this._cache[key];
+};
+Function.prototype.memoize = function () {
+  let fn = this;
+  if (fn.length === 0 || fn.length > 1) {
+    return;
+  }
+  return function () {
+    return fn.memoized.apply(fn, arguments);
+  };
+};
+```
+
+### Function Compose
+
+```js
+function compose(...fns) {
+  let start = fns.lenght - 1;
+  return function (...args) {
+    let i = start;
+    let result = fns[start].apply(this, args);
+    while (i--) {
+      result = fns[i].call(this, result);
+    }
+    return result;
+  };
+}
+```
+
+## Promise
+
+### Static methods
+
+```js
+let o = new Promise((res, rej) => setTimeout(res, 1000, 'o'));
+let r = new Promise((res, rej) => setTimeout(res, 500, 'r'));
+Promise.myRace = function (arr) {
+  return new Promise((res, rej) => {
+    arr.forEach((p) => {
+      if (p instanceof Promise) {
+        p.then((v) => res(v), rej);
+      } else {
+        res(p);
+      }
+    });
+  });
+};
+Promise.myRace([o, r, 6]).then((v) => console.log(v));
+```
+
+```js
+ Promise.myAll = function (iterator) {
+        let results = [];
+        let len = iterator.length;
+        let count = 0;
+        return new Promise((res, rej) => {
+          for (let i = 0; i < len; i++) {
+            if (!(iterator[i] instanceof Promise)) {
+              results[i] = iterator[i];
+              if (count === len - 1) res(result);
+              count++;
+            } else {
+              iterator[i].then(
+                (v) => {
+                  results[i] = v;
+                  if (count === len - 1) res(results);
+                  count++;
+                },
+                (v) => rej(v)
+              );
+            }
+          }
+        });
+      };
+```
+
+```js
+  Promise.prototype.myFinally = function (onFin) {
+        return new Promise((res, rej) => {
+          this.then(
+            () => onFin(),
+            () => onFin()
+          );
+        });
+      };
+```
+
+
+
+### Sleep
+
+```
+
+```
+
+### Task Queue
+
+````
+
+````
 
 
 
@@ -199,42 +260,40 @@ Function Compose
     }
   </style>
   <body>
-  <div id="xxx"></div>
-    <script >
-        const Draggable = function (el) {
-  this.el = el;
-  this.init();
-};
-Draggable.prototype.init = function () {
-  this.el.addEventListener('mousedown', (e) => {
-    this.dragging = true;
-    this.position = [e.clientX, e.clientY];
-    console.log(this.dragging);
-    this.bind();
-  });
-};
-Draggable.prototype.bind = function () {
-  document.addEventListener('mousemove', (e) => {
-    if (this.dragging === false) return null;
-    const x = e.clientX;
-    const y = e.clientY;
-    const deltaX = x - this.position[0];
-    const deltaY = y - this.position[1];
-    const left = parseInt(this.el.style.left || 0);
-    const top = parseInt(this.el.style.top || 0);
-    this.el.style.left = left + deltaX + 'px';
-    this.el.style.top = top + deltaY + 'px';
-    this.position = [x, y];
-  });
-  document.addEventListener('mouseup', (e) => {
-    this.dragging = false;
-  });
-};
-const xxx = document.querySelector('#xxx');
-let x = new Draggable(xxx);
-      </script>
+    <div id="xxx"></div>
+    <script>
+      const Draggable = function (el) {
+        this.el = el;
+        this.init();
+      };
+      Draggable.prototype.init = function () {
+        this.el.addEventListener('mousedown', (e) => {
+          this.dragging = true;
+          this.position = [e.clientX, e.clientY];
+          console.log(this.dragging);
+          this.bind();
+        });
+      };
+      Draggable.prototype.bind = function () {
+        document.addEventListener('mousemove', (e) => {
+          if (this.dragging === false) return null;
+          const x = e.clientX;
+          const y = e.clientY;
+          const deltaX = x - this.position[0];
+          const deltaY = y - this.position[1];
+          const left = parseInt(this.el.style.left || 0);
+          const top = parseInt(this.el.style.top || 0);
+          this.el.style.left = left + deltaX + 'px';
+          this.el.style.top = top + deltaY + 'px';
+          this.position = [x, y];
+        });
+        document.addEventListener('mouseup', (e) => {
+          this.dragging = false;
+        });
+      };
+      const xxx = document.querySelector('#xxx');
+      let x = new Draggable(xxx);
+    </script>
   </body>
 </html>
-
 ```
-
