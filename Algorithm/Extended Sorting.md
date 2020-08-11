@@ -2,6 +2,46 @@
 
 # Extended Sorting
 
+## LinkedList
+
+#### Bubble
+
+```js
+function sortList(head) {
+  let count = 0;
+  let node = head;
+  while (node) {
+    count++;
+    node = node.next;
+  }
+
+  const bubble = (head, count) => {
+    if (!head) return head;
+    for (let i = 1; i < count; i++) {
+      let j = count - i;
+      let h = head;
+      while (j > 0 && h.next) {
+        let p1 = h,
+          p2 = p1.next;
+        if (p1.val > p2.val) {
+          if (p1 === head) head = p2;
+          let next = p2.next;
+          p2.next = p1;
+          p1.next = next;
+        } else {
+          h = h.next;
+        }
+        j--;
+      }
+    }
+    return head;
+  };
+  return bubble(head, count);
+}
+```
+
+
+
 ## Quick sorting related questions 
 
 Using `pointers` as partition
@@ -9,8 +49,6 @@ Using `pointers` as partition
 eg. elements within [ left, i) are smaller than pivot/target, ( j, right ] greater.
 
 The loop starts with empty partition and stops when the pointers are not valid
-
-### LeetCode
 
 ### [75. Sort Colors](https://leetcode-cn.com/problems/sort-colors/)
 
@@ -96,7 +134,7 @@ function quickSelect(nums, left, right, k) {
 }
 ```
 
-#### [88. Merge Sorted Array](https://leetcode-cn.com/problems/merge-sorted-array/)
+### [88. Merge Sorted Array](https://leetcode-cn.com/problems/merge-sorted-array/)
 
 Three pointers:
 
@@ -130,7 +168,7 @@ var merge = function (nums1, m, nums2, n) {
 };
 ```
 
-#### [15. 3Sum](https://leetcode-cn.com/problems/3sum/)
+### [15. 3Sum](https://leetcode-cn.com/problems/3sum/)
 
 > Given an array nums of n integers, are there elements a, b, c in nums such that a + b + c = 0? Find all unique triplets in the array which gives the sum of zero.
 >

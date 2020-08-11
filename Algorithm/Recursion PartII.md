@@ -1,6 +1,8 @@
+[toc]
+
 # Recursion Part II
 
-## Bubble sorting
+## Bubble sorting: recursive way
 
 ```js
 function recurBubble(arr) {
@@ -17,6 +19,31 @@ function recurBubble(arr) {
   return [...recurBubble(arr), ...max];
 }
 ```
+
+## Insert sorting
+
+<img alt="insrtsorting" src="https://mmbiz.qpic.cn/mmbiz_png/rSmDLkNsngSqWBfYzlutsadsdibAGcVaDvdwnmKYD06mojp4UuMgme7mep3O562WSvNUdJo3PpqG6aE5zUVX0RA/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1" style="zoom:67%;" >
+
+```js
+function insertRecu(arr) {
+  let nums = [...arr];
+  const recursion = (nums, n) => {
+    if (n <= 1) return;
+    recursion(nums, n - 1);
+    let temp = nums[n - 1];
+    let j = n - 2;
+    while (j >= 0 && temp < nums[j]) {
+      nums[j + 1] = nums[j];
+      j--;
+    }
+    nums[j + 1] = temp;
+  };
+  recursion(nums, nums.length);
+  return nums;
+}
+```
+
+
 
 ## Tail recursion & currying
 

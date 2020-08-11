@@ -1,5 +1,7 @@
 
 
+[toc]
+
 # Linked List
 
 ### [206. Reverse Linked List](https://leetcode-cn.com/problems/reverse-linked-list/)
@@ -280,16 +282,6 @@ var isPalindrome = function (head) {
 
 Sort a linked list in O(n log n) time using constant space complexity.
 
-> Example 1:
->
-> Input: 4->2->1->3
-> Output: 1->2->3->4
-
-> Example 2:
->
-> Input: -1->5->3->4->0
-> Output: -1->0->3->4->5
-
 Merge sorting:
 
 It's easy to just apply the <a href="https://southchen.github.io/2020/05/21/Template-for-Divided-Conquer-Algorithm/">Divided Conqure algorithm template</a> 😁
@@ -346,14 +338,6 @@ var sortList = function (head) {
 
 ### [19. Remove Nth Node From End of List](https://leetcode-cn.com/problems/remove-nth-node-from-end-of-list/)
 
-Given a linked list, remove the n-th node from the end of list and return its head.
-
-> Example:
-> Given linked list: 1->2->3->4->5, and n = 2.
-> After removing the second node from the end, the linked list becomes 1->2->3->5
-
-Given n will always be valid.
-
 Two Pointers:
 
 the faster one is n step ahead of the slower one. Then they move forwards together.  When the fast pointer reaches the end, the slow pointer is pointing to the nth element from end of list.
@@ -379,16 +363,6 @@ var removeNthFromEnd = function (head, n) {
 ```
 
 ###  [2. Add Two Numbers](https://leetcode-cn.com/problems/add-two-numbers/)
-
-You are given two non-empty linked lists representing two non-negative integers. The digits are stored in reverse order and each of their nodes contain a single digit. Add the two numbers and return it as a linked list.
-
-You may assume the two numbers do not contain any leading zero, except the number 0 itself.
-
-> Example:
->
-> Input: (2 -> 4 -> 3) + (5 -> 6 -> 4)
-> Output: 7 -> 0 -> 8
-> Explanation: 342 + 465 = 807.
 
 ```js
 var addTwoNumbers = function (l1, l2) {
