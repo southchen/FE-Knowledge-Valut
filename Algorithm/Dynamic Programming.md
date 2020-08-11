@@ -742,3 +742,38 @@ var longestPalindrome = function (s) {
 };
 ```
 
+
+
+[542. 01 Matrix](https://leetcode-cn.com/problems/01-matrix/)
+
+两次DP：一次从左上到右下，一次从右下到左上
+
+```js
+var updateMatrix = function (matrix) {
+  if (!matrix.length || !matrix[0].length) return null;
+
+  let n = matrix.length;
+  let m = matrix[0].length;
+  let ans = new Array(n);
+  for (let i = 0; i < n; i++) ans[i] = new Array(m).fill(n + m);
+
+  for (let i = 0; i < n; i++)
+    for (let j = 0; j < m; j++) if (matrix[i][j] === 0) ans[i][j] = 0;
+
+  for (let i = 0; i < n; i++)
+    for (let j = 0; j < m; j++) {
+      if (i - 1 >= 0) ans[i][j] = Math.min(ans[i][j], ans[i - 1][j] + 1);
+      if (j - 1 >= 0) ans[i][j] = Math.min(ans[i][j], ans[i][j - 1] + 1);
+    }
+
+  for (let i = n - 1; i >= 0; i--)
+    for (let j = m - 1; j >= 0; j--) {
+      if (i + 1 < n) ans[i][j] = Math.min(ans[i][j], ans[i + 1][j] + 1);
+      if (j + 1 < m) ans[i][j] = Math.min(ans[i][j], ans[i][j + 1] + 1);
+    }
+
+  return ans;
+};
+
+```
+

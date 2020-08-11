@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 [TOC]
 
 # Sorting
@@ -6,13 +7,13 @@
 
 ### Time Complexity: O(n^2)
 
-​	最坏：数组逆序
+​ 最坏：数组逆序
 
-​	i取值范围0~n-2;
+​ i 取值范围 0~n-2;
 
-​	 i 为0，j 的取值范围是从 0 到 n -1，内循环执行 n - 1 次; i为1 ，j 的取值范围是从 0 到 n -2，内循环执行 n - 2 次；j为n-2，j取值为1 ，内循环一次
+​ i 为 0，j 的取值范围是从 0 到 n -1，内循环执行 n - 1 次; i 为 1 ，j 的取值范围是从 0 到 n -2，内循环执行 n - 2 次；j 为 n-2，j 取值为 1 ，内循环一次
 
-​	1 + 2 + 3 + ... + (n - 2) + (n - 1)  ==> n*(n-1)/2==>O(n^2)
+​ 1 + 2 + 3 + ... + (n - 2) + (n - 1) ==> n\*(n-1)/2==>O(n^2)
 
 ### Space Complexity: O(1)
 
@@ -81,22 +82,23 @@ After first round of loop, the array was : [2,1,`4,5,6,8`]
 
 The element after LastSwappedIndex was already sorted.
 
-用LastSwappedIndex确定出已经有序部分和无序部分的边界，更新”挡板“索引
+用 LastSwappedIndex 确定出已经有序部分和无序部分的边界，更新”挡板“索引
 
 ```js
 function bubbleOpt(arr) {
   let nums = [...arr];
   let len = nums.length;
-  let border = len - 1;//初始化为最后一个元素
+  let border = len - 1; //初始化为最后一个元素
   for (let i = 0; i < len - 1; i++) {
-    let last = len - i;//初始化为最后一个有序
-    for (let j = 1; j < border; j++) {//j<border，开区间取不到，last=>j而不是j-1
+    let last = len - i; //初始化为最后一个有序
+    for (let j = 1; j < border; j++) {
+      //j<border，开区间取不到，last=>j而不是j-1
       if (nums[j] < nums[j - 1]) {
         [nums[j], nums[j - 1]] = [nums[j - 1], nums[j]];
-        last = j;//交换过，就更新last
-        }
+        last = j; //交换过，就更新last
+      }
     }
-    border = last;//内层循环结束后，更新挡板位置
+    border = last; //内层循环结束后，更新挡板位置
   }
   return nums;
 }
@@ -142,11 +144,11 @@ bubbleSort(arr, (a, b) => a - b);
    依次遍历**未排序区间**里的元素，在已排序区间里找到正确的位置插入；
 3. 重复这个过程，直到未排序区间为空。
 
-外循环i，指向第一个未排好序的元素；
+外循环 i，指向第一个未排好序的元素；
 
-内循环j，指向未排好序的前一个，从后向前遍历排好序的区域，把temp放入正确的位置。
+内循环 j，指向未排好序的前一个，从后向前遍历排好序的区域，把 temp 放入正确的位置。
 
-通过前一个数覆盖后一个数，来后移数组，最后用temp覆盖正确位置的值。
+通过前一个数覆盖后一个数，来后移数组，最后用 temp 覆盖正确位置的值。
 
 ```js
 function insertion(arr) {
@@ -154,12 +156,13 @@ function insertion(arr) {
   for (let i = 1; i < arr.length; i++) {
     temp = arr[i];
     let j = i - 1;
-     //shifting
-    while (j >= 0 && temp < arr[j]) {//没有temp== arr[j]，保持稳定性
+    //shifting
+    while (j >= 0 && temp < arr[j]) {
+      //没有temp== arr[j]，保持稳定性
       arr[j + 1] = arr[j]; //后移操作逻辑：j+1的元素被j元素覆盖，直到不应该移动的时候退出循环
       j--;
     }
-     //insert
+    //insert
     arr[j + 1] = temp; //退出循环的两种情况：1.j==-1，即被插入的temp应该为第一个； 2.temp比arr[j]大了。需要把temp放好
   }
   return arr;
@@ -170,32 +173,35 @@ optimized by binary-search when insert the new element into the sorted array:
 
 ```js
 function binaryInsertionSort(array) {
-        for (var i = 1; i < array.length; i++) {
-            var temp = array[i], left = 0, right = i - 1;
-            //找第一个比temp大的数，前一个即为正确的位置
-            while (left <= right) {
-                var middle = (left+right)>>1
-                if (temp < array[middle]) {
-                   right = middle - 1;
-                } else { //temp>=arr[m]
-                    left = middle + 1;
-                }
-            }
-            //只需移动该位置之后的元素（包括左边界）
-            for (var j = i - 1; j >= left; j--) {
-                array[j + 1] = array[j];
-            }
-            array[left] =temp;
-        }
-        return array;
-    } 
+  for (var i = 1; i < array.length; i++) {
+    var temp = array[i],
+      left = 0,
+      right = i - 1;
+    //找第一个比temp大的数，前一个即为正确的位置
+    while (left <= right) {
+      var middle = (left + right) >> 1;
+      if (temp < array[middle]) {
+        right = middle - 1;
+      } else {
+        //temp>=arr[m]
+        left = middle + 1;
+      }
+    }
+    //只需移动该位置之后的元素（包括左边界）
+    for (var j = i - 1; j >= left; j--) {
+      array[j + 1] = array[j];
+    }
+    array[left] = temp;
+  }
+  return array;
+}
 ```
 
 ## Selection
 
 ### Time Complexity: O(n^2)
 
-  外循环i为0时，内循环n-1次；i为1时，内循环n-2次；...外循环i为length-2时，内循环1次；
+外循环 i 为 0 时，内循环 n-1 次；i 为 1 时，内循环 n-2 次；...外循环 i 为 length-2 时，内循环 1 次；
 
 1+2+3...(n-1)==>O(n^2)
 
@@ -219,27 +225,26 @@ swap 中需要空间，常数
 
 注意与插入排序的不同：
 
-* 外层循环从0开始，因为没有已排好序的元素；
+- 外层循环从 0 开始，因为没有已排好序的元素；
 
-* 初始最小值索引即为外循环当前值，因为有可能当前值即为最小值。
+- 初始最小值索引即为外循环当前值，因为有可能当前值即为最小值。
 
 ```js
 function select(nums) {
-  for (let i = 0; i < nums.length - 1; i++) {//每次循环完，挡板右移
+  for (let i = 0; i < nums.length - 1; i++) {
+    //每次循环完，挡板右移
     let minInd = i;
     for (var j = i + 1; j < nums.length; j++) {
       if (nums[minInd] > nums[j]) {
-        minInd = j;//更新最小值位置
+        minInd = j; //更新最小值位置
       }
     }
- //最小的和挡板右边第一个交换
+    //最小的和挡板右边第一个交换
     [nums[minInd], nums[i]] = [nums[i], nums[minInd]];
   }
   return nums;
 }
 ```
-
-
 
 ## Quick
 
@@ -247,15 +252,15 @@ function select(nums) {
 
 Left ➡️ pivot ➡️ right recursively
 
-快速排序首先选一个基准pivot，然后将数组按照选取的基准 pivot 进行划分。
+快速排序首先选一个基准 pivot，然后将数组按照选取的基准 pivot 进行划分。
 
 每一趟划分，我们就可以将作为 pivot 的值 x 放到排序数组的正确位置，并且将所有比 x 小的放到 x 的左边，所有比 x 大的元素放到 x 的右边。
 
-之后递归地执行quick，分别传入x左边的数组，x右边数组
+之后递归地执行 quick，分别传入 x 左边的数组，x 右边数组
 
 ### Time Complexity: O(nlogn)
 
-分析递归树，随机选择pivot
+分析递归树，随机选择 pivot
 
 <img src="https://mmbiz.qpic.cn/mmbiz_png/og5r7PHGHojj6Bibeq2zyOfoVutxZYglou623yhg7QhMu97XCPXQ8xASIRRrmys3qXfEEWwtSOWZrLcicBf9TuDg/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1" style="zoom:67%;" />
 
@@ -263,7 +268,7 @@ Left ➡️ pivot ➡️ right recursively
 - 均分的话那就是 logn 层；
 - 所以总的时间是 O(nlogn).
 
-最坏情况，每次pivot选择为最大值/最小
+最坏情况，每次 pivot 选择为最大值/最小
 
 <img src="https://mmbiz.qpic.cn/mmbiz_png/og5r7PHGHojj6Bibeq2zyOfoVutxZYgloue06BFpovFicUDcBPAb4xZaMibxjR14oRybcwialdIeiblIlqiciavL3mxyg/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1" style="zoom:50%;" />
 
@@ -288,18 +293,18 @@ O(n^2)
 #### Extra space needed:
 
 ```js
-  function quick(nums) {
-        if (nums.length <= 1) return nums;
-        let mid = Math.floor(nums.length / 2);
-        let pivot = nums.splice(mid, 1);
-        let left = [],
-          right = [];
-        for (num of nums) {
-          if (num < pivot) left.push(num);
-          if (num >= pivot) right.push(num);
-        }
-   return [...quick(left), ...pivot, ...quick(right)]; //recursion
-   }
+function quick(nums) {
+  if (nums.length <= 1) return nums;
+  let mid = Math.floor(nums.length / 2);
+  let pivot = nums.splice(mid, 1);
+  let left = [],
+    right = [];
+  for (num of nums) {
+    if (num < pivot) left.push(num);
+    if (num >= pivot) right.push(num);
+  }
+  return [...quick(left), ...pivot, ...quick(right)]; //recursion
+}
 ```
 
 #### Using pointer as partition, no extra space needed:
@@ -340,8 +345,6 @@ const quick = (nums, l, r) => {
 };
 ```
 
-
-
 ## Merge
 
 ### Time Complexity: O(nlogn)
@@ -358,43 +361,41 @@ const quick = (nums, l, r) => {
 
 「合」：用小问题的解构造大问题的解。
 
-
-
 <img src="https://mmbiz.qpic.cn/mmbiz_png/rSmDLkNsngTcufcibyRlPInB4bwk63sOWfwEvSURiaGlwlqFuRT5Szj8ibic4ibgLGOkER2nuYlXkFVQpzNynVojyZw/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1" alt="merge" style="zoom:50%;" />
 
 ```js
-function mergeSorting(nums){
-    if(nums.length<2) return nums;
-    let mid = Math.floor(nums.length/2)
-    let left = nums.slice(0,mid)
-    let right = nums.slice(mid);
-    function merge(left,right){
-        let res=[];
-        while(left.legth&&right.length){
-            if(left[0]<=right[0]){
-            res.push(left.shift())
-        }else{
-            res.push(right.shift())
-        }
-              }
-           while(left.length){
+function mergeSorting(nums) {
+  if (nums.length < 2) return nums;
+  let mid = Math.floor(nums.length / 2);
+  let left = nums.slice(0, mid);
+  let right = nums.slice(mid);
+  function merge(left, right) {
+    let res = [];
+    while (left.legth && right.length) {
+      if (left[0] <= right[0]) {
         res.push(left.shift());
-    }
-    while(right.length){
+      } else {
         res.push(right.shift());
+      }
     }
-        return res;
+    while (left.length) {
+      res.push(left.shift());
     }
-    merge(mergeSorting(left),mergeSorting(right))
+    while (right.length) {
+      res.push(right.shift());
+    }
+    return res;
+  }
+  merge(mergeSorting(left), mergeSorting(right));
 }
 ```
 
 Optimization by replacing slice with splice
 
 ```js
-    let mid = Math.floor(nums.length/2)
-    let left = nums.splice(0,mid)
-    let right = nums
+let mid = Math.floor(nums.length / 2);
+let left = nums.splice(0, mid);
+let right = nums;
 ```
 
 Using pointer as partition to merge the array, (update in-place on the old array)
@@ -449,11 +450,11 @@ function merge(arr, l, mid, r) {
 
 在归并排序中，数组总被划分为两半；而快速排序，数组可能被划分为任意比例，而不是强制要求将数组划分为相等的两部分。
 
-快速排序最坏情况下的时间复杂度为 O(n^2); 归并排序，最坏情况和平均情况下的时间复杂度均为O(nlogn) 。
+快速排序最坏情况下的时间复杂度为 O(n^2); 归并排序，最坏情况和平均情况下的时间复杂度均为 O(nlogn) 。
 
 归并排序适用于任何类型的数据集，不受数据集大小限制；快速排序不适用于大规模数据集。
 
-归并排序需要额外的存储空间O(n)，不是一个原地排序算法；而快速排序不需要额外的空间，空间复杂度为O(1)，为原地排序算法。
+归并排序需要额外的存储空间 O(n)，不是一个原地排序算法；而快速排序不需要额外的空间，空间复杂度为 O(1)，为原地排序算法。
 
 归并排序在大规模的数据集上比快速排序更加高效，而快速排序在小规模的数据集上更高效。
 
@@ -503,7 +504,7 @@ Space Complexity: O()
 function heapSort(arr) {
   let size = arr.length;
 
-  // 初始化堆，i 从最后一个父节点开始调整，直到节点均调整完毕 
+  // 初始化堆，i 从最后一个父节点开始调整，直到节点均调整完毕
   for (let i = Math.floor(size / 2) - 1; i >= 0; i--) {
     heapify(arr, i, size);
   }
@@ -535,17 +536,15 @@ function heapify(arr, index, size) {
 }
 ```
 
-## in-place sorting 
+## in-place sorting
 
-* insertion
-* selection
+- insertion
+- selection
 
 ## Stability
 
 <img src='https://mmbiz.qpic.cn/mmbiz_png/rSmDLkNsngTPoibiaO4tryNfibHWTWW6FVuPticdfn8lEWe10fvgn78nRyVfmrOTlreSwlYMe8yhWnWATaRRlI60ng/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1' style="zoom: 67%;">
 
 <img src="https://mmbiz.qpic.cn/mmbiz_png/rSmDLkNsngTPoibiaO4tryNfibHWTWW6FVudIjia1oQEUORkJA7jIfD1ibj9IdUB6XjvYdqZwQ4ImialKic9pADVmkNkA/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1" style="zoom:67%;" />
-
-
 
 ref:<a src='https://www.rayjune.me/2018/03/22/elegant-javascript-sorting-algorithm-es6/'>优雅的 JavaScript 排序算法（ES6）</a>

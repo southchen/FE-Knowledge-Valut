@@ -24,14 +24,15 @@ object instanceof constructor :point_right: myInstanceOf(leftVaule, rightVaule)
 ### Create
 
 ```js
-let sub = Object.create(Sup.prototype)
-let sub = myCreate(Sup.prototype)
-function myCreate(_proto){
-	function F(){}
-	F.prototype=_proto;
-	return new F()
+let sub = Object.create(Sup.prototype);
+let sub = myCreate(Sup.prototype);
+function myCreate(_proto) {
+  function F() {}
+  F.prototype = _proto;
+  return new F();
 }
 ```
+
 ### Inheritance
 
 ## Function
@@ -65,65 +66,69 @@ Function.prototype.myApply = function (thisArg = window, ...args) {
 };
 ```
 
-
 ### .prototype.bind()
+
 let boo = foo.bind(thisArg,args)
 
 ```js
-Function.prototype.myBind=function (thisArg=window,...args){
-	return ()=>{
-        let result=this.call(thisArg,...args)
-        return result;
-    }
-}
+Function.prototype.myBind = function (thisArg = window, ...args) {
+  return () => {
+    let result = this.call(thisArg, ...args);
+    return result;
+  };
+};
 ```
 
 work with `new (funcA.bind(thisArg, args))`
 
 ```js
-if (!Function.prototype.bind) (function(){
-  var ArrayPrototypeSlice = Array.prototype.slice;
-  Function.prototype.bind = function(otherThis) {
-    if (typeof this !== 'function') {
-      // closest thing possible to the ECMAScript 5
-      // internal IsCallable function
-      throw new TypeError('Function.prototype.bind - what is trying to be bound is not callable');
-    }
-    var baseArgs= ArrayPrototypeSlice.call(arguments, 1),
+if (!Function.prototype.bind)
+  (function () {
+    var ArrayPrototypeSlice = Array.prototype.slice;
+    Function.prototype.bind = function (otherThis) {
+      if (typeof this !== 'function') {
+        // closest thing possible to the ECMAScript 5
+        // internal IsCallable function
+        throw new TypeError(
+          'Function.prototype.bind - what is trying to be bound is not callable'
+        );
+      }
+      var baseArgs = ArrayPrototypeSlice.call(arguments, 1),
         baseArgsLength = baseArgs.length,
         fToBind = this,
-        fNOP    = function() {},
-        fBound  = function() {
+        fNOP = function () {},
+        fBound = function () {
           baseArgs.length = baseArgsLength; // reset to default base arguments
           baseArgs.push.apply(baseArgs, arguments);
           return fToBind.apply(
-                 fNOP.prototype.isPrototypeOf(this) ? this : otherThis, baseArgs
+            fNOP.prototype.isPrototypeOf(this) ? this : otherThis,
+            baseArgs
           );
         };
 
-    if (this.prototype) {
-      // Function.prototype doesn't have a prototype property
-      fNOP.prototype = this.prototype;
-    }
-    fBound.prototype = new fNOP();
-    return fBound;
-  };
-})();
+      if (this.prototype) {
+        // Function.prototype doesn't have a prototype property
+        fNOP.prototype = this.prototype;
+      }
+      fBound.prototype = new fNOP();
+      return fBound;
+    };
+  })();
 ```
 
 ### Currying
 
 ```js
-    function currying(fn) {
-        let len = fn.length;
-        let fullArg = [];
-        return function curry(...args) {
-          len -= args.length;
-          fullArg.push(...args);
-          if (len === 0) return fn(...fullArg);
-          return curry;
-        };
-      }
+function currying(fn) {
+  let len = fn.length;
+  let fullArg = [];
+  return function curry(...args) {
+    len -= args.length;
+    fullArg.push(...args);
+    if (len === 0) return fn(...fullArg);
+    return curry;
+  };
+}
 ```
 
 ### Function memoization
@@ -164,7 +169,11 @@ function compose(...fns) {
 
 ## Promise
 
+# <<<<<<< HEAD
+
 ### Static methods
+
+> > > > > > > 5bd44931789d9a6de208f4bd36e48fc865168eb7
 
 ```js
 let o = new Promise((res, rej) => setTimeout(res, 1000, 'o'));
@@ -184,43 +193,41 @@ Promise.myRace([o, r, 6]).then((v) => console.log(v));
 ```
 
 ```js
- Promise.myAll = function (iterator) {
-        let results = [];
-        let len = iterator.length;
-        let count = 0;
-        return new Promise((res, rej) => {
-          for (let i = 0; i < len; i++) {
-            if (!(iterator[i] instanceof Promise)) {
-              results[i] = iterator[i];
-              if (count === len - 1) res(result);
-              count++;
-            } else {
-              iterator[i].then(
-                (v) => {
-                  results[i] = v;
-                  if (count === len - 1) res(results);
-                  count++;
-                },
-                (v) => rej(v)
-              );
-            }
-          }
-        });
-      };
+Promise.myAll = function (iterator) {
+  let results = [];
+  let len = iterator.length;
+  let count = 0;
+  return new Promise((res, rej) => {
+    for (let i = 0; i < len; i++) {
+      if (!(iterator[i] instanceof Promise)) {
+        results[i] = iterator[i];
+        if (count === len - 1) res(result);
+        count++;
+      } else {
+        iterator[i].then(
+          (v) => {
+            results[i] = v;
+            if (count === len - 1) res(results);
+            count++;
+          },
+          (v) => rej(v)
+        );
+      }
+    }
+  });
+};
 ```
 
 ```js
-  Promise.prototype.myFinally = function (onFin) {
-        return new Promise((res, rej) => {
-          this.then(
-            () => onFin(),
-            () => onFin()
-          );
-        });
-      };
+Promise.prototype.myFinally = function (onFin) {
+  return new Promise((res, rej) => {
+    this.then(
+      () => onFin(),
+      () => onFin()
+    );
+  });
+};
 ```
-
-
 
 ### Sleep
 
@@ -230,9 +237,9 @@ Promise.myRace([o, r, 6]).then((v) => console.log(v));
 
 ### Task Queue
 
-````
+```
 
-````
+```
 
 ## Encapsulate a draggable element
 
@@ -284,4 +291,3 @@ Promise.myRace([o, r, 6]).then((v) => console.log(v));
   </body>
 </html>
 ```
-
