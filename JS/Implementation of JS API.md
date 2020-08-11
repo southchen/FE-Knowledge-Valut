@@ -2,7 +2,9 @@
 
 # Implementation of JS API
 
-## New operator
+## Object
+
+### New operator
 
 `let a = new ACon(args)` :point_right: `let a =_new(ACon,args)`
 
@@ -15,43 +17,29 @@ function _new(Ctor, ...args) {
 }
 ```
 
-## Instanceof operator
+### Instanceof operator
 
 object instanceof constructor :point_right: myInstanceOf(leftVaule, rightVaule)
 
-```
+### Create
 
-```
-
-## Sleep
-
-```
-
-```
-
-## Object.create()
-
-let sub = Object.create(Sup.prototype)
-
-let sub = myCreate(Sup.prototype)
-
-```
-function myCreate(_proto){
-	function F(){}
-	F.prototype=_proto;
-	return new F()
+```js
+let sub = Object.create(Sup.prototype);
+let sub = myCreate(Sup.prototype);
+function myCreate(_proto) {
+  function F() {}
+  F.prototype = _proto;
+  return new F();
 }
 ```
 
-## Inheritance
+### Inheritance
 
-```
+## Function
 
-```
+### .prototype.call()
 
-## Function.prototype.call()
-
-## Function.prototype.apply()
+### .prototype.apply()
 
 ```js
 Function.prototype.myCall = function (thisArg = window, ...args) {
@@ -78,51 +66,72 @@ Function.prototype.myApply = function (thisArg = window, ...args) {
 };
 ```
 
-## Function.prototype.bind()
+### .prototype.bind()
 
 let boo = foo.bind(thisArg,args)
 
-```
-
+```js
+Function.prototype.myBind = function (thisArg = window, ...args) {
+  return () => {
+    let result = this.call(thisArg, ...args);
+    return result;
+  };
+};
 ```
 
 work with `new (funcA.bind(thisArg, args))`
 
 ```js
->>>>>>> 6ef3d5a835b34f86e658f1b9f1bbdef8bcf3618a
-if (!Function.prototype.bind) (function(){
-  var ArrayPrototypeSlice = Array.prototype.slice;
-  Function.prototype.bind = function(otherThis) {
-    if (typeof this !== 'function') {
-      // closest thing possible to the ECMAScript 5
-      // internal IsCallable function
-      throw new TypeError('Function.prototype.bind - what is trying to be bound is not callable');
-    }
-
-    var baseArgs= ArrayPrototypeSlice.call(arguments, 1),
+if (!Function.prototype.bind)
+  (function () {
+    var ArrayPrototypeSlice = Array.prototype.slice;
+    Function.prototype.bind = function (otherThis) {
+      if (typeof this !== 'function') {
+        // closest thing possible to the ECMAScript 5
+        // internal IsCallable function
+        throw new TypeError(
+          'Function.prototype.bind - what is trying to be bound is not callable'
+        );
+      }
+      var baseArgs = ArrayPrototypeSlice.call(arguments, 1),
         baseArgsLength = baseArgs.length,
         fToBind = this,
-        fNOP    = function() {},
-        fBound  = function() {
+        fNOP = function () {},
+        fBound = function () {
           baseArgs.length = baseArgsLength; // reset to default base arguments
           baseArgs.push.apply(baseArgs, arguments);
           return fToBind.apply(
-                 fNOP.prototype.isPrototypeOf(this) ? this : otherThis, baseArgs
+            fNOP.prototype.isPrototypeOf(this) ? this : otherThis,
+            baseArgs
           );
         };
 
-    if (this.prototype) {
-      // Function.prototype doesn't have a prototype property
-      fNOP.prototype = this.prototype;
-    }
-    fBound.prototype = new fNOP();
-
-    return fBound;
-  };
-})();
+      if (this.prototype) {
+        // Function.prototype doesn't have a prototype property
+        fNOP.prototype = this.prototype;
+      }
+      fBound.prototype = new fNOP();
+      return fBound;
+    };
+  })();
 ```
 
-## Currying
+### Currying
+
+```js
+function currying(fn) {
+  let len = fn.length;
+  let fullArg = [];
+  return function curry(...args) {
+    len -= args.length;
+    fullArg.push(...args);
+    if (len === 0) return fn(...fullArg);
+    return curry;
+  };
+}
+```
+
+### Function memoization
 
 ```js
 Function.prototype.memoized = function () {
@@ -142,27 +151,7 @@ Function.prototype.memoize = function () {
 };
 ```
 
-Function memoization
-
-```js
-Function.prototype.memoized = function () {
-  let key = JSON.stringify(arguments);
-  this._cache = this.cache || {};
-  this._cache[key] = this._cache[key] || this.apply(this, arguments);
-  return this._cache[key];
-};
-Function.prototype.memoize = function () {
-  let fn = this;
-  if (fn.length === 0 || fn.length > 1) {
-    return;
-  }
-  return function () {
-    return fn.memoized.apply(fn, arguments);
-  };
-};
-```
-
-Function Compose
+### Function Compose
 
 ```js
 function compose(...fns) {
@@ -179,6 +168,12 @@ function compose(...fns) {
 ```
 
 ## Promise
+
+# <<<<<<< HEAD
+
+### Static methods
+
+> > > > > > > 5bd44931789d9a6de208f4bd36e48fc865168eb7
 
 ```js
 let o = new Promise((res, rej) => setTimeout(res, 1000, 'o'));
@@ -198,33 +193,53 @@ Promise.myRace([o, r, 6]).then((v) => console.log(v));
 ```
 
 ```js
-Promise.all = function(values){
-    return new Promise((resolve,reject)=>{
-        let arr = [];
-        let i = 0;
-        let processData = function(key,value){
-            arr[key] = value;
-            if(++i === values.length){
-                resolve(arr)
-            }
-        }
-        for(let i = 0; i < values.length; i++){
-            let current = values[i];
-            if(current instanceof Promise){   //判断传进来的是promise还是普通数据
-                current.then(y=>{
-                    processData(i,y)
-                },reject)
-            }else{
-                processData(i,current)
-            }
-        }
-    })
-}
+Promise.myAll = function (iterator) {
+  let results = [];
+  let len = iterator.length;
+  let count = 0;
+  return new Promise((res, rej) => {
+    for (let i = 0; i < len; i++) {
+      if (!(iterator[i] instanceof Promise)) {
+        results[i] = iterator[i];
+        if (count === len - 1) res(result);
+        count++;
+      } else {
+        iterator[i].then(
+          (v) => {
+            results[i] = v;
+            if (count === len - 1) res(results);
+            count++;
+          },
+          (v) => rej(v)
+        );
+      }
+    }
+  });
+};
 ```
 
+```js
+Promise.prototype.myFinally = function (onFin) {
+  return new Promise((res, rej) => {
+    this.then(
+      () => onFin(),
+      () => onFin()
+    );
+  });
+};
+```
 
+### Sleep
 
+```
 
+```
+
+### Task Queue
+
+```
+
+```
 
 ## Encapsulate a draggable element
 
