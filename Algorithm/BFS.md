@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 [TOC]
 
 # BFS
@@ -289,7 +288,7 @@ var connect = function (root) {
 
 #### [279. Perfect Squares](https://leetcode-cn.com/problems/perfect-squares/)
 
-```
+```js
 var numSquares = function (n) {
   let queue = [n];
   let visited = {};
@@ -318,6 +317,10 @@ var numSquares = function (n) {
 ```
 
 #### [200. Number of Islands](https://leetcode-cn.com/problems/number-of-islands/)
+
+沉岛。遇到1，陆地，计数一次。把相连的陆地都沉下，即标记为海洋0；
+
+用队列记录相邻的陆地，依次取出，依次沉岛。
 
 ```js
 const numIslands = (grid) => {
@@ -411,10 +414,127 @@ const orangesRotting = (grid) => {
 };
 ```
 
+
+
+# 多源BFS
+
+**「Tree 的 BFS」 （典型的「单源 BFS」）** ：
+
+- 首先把 root 节点入队，再一层一层无脑遍历就行了。
+- 从起点开始向四周扩散，遇到终点时停⽌；
+
+⽽双向 BFS 则是从起点和终点同时开始扩散，当两边有交集的时候停⽌。双向 BFS 也有局限，因为你必须知道终点在哪⾥
+
+**对于 「图 的 BFS」 （「多源 BFS」）**
+
+* Tree 只有 1 个 root，而图可以有多个源点，所以首先需要把多个源点都入队；
+* Tree 是有向的因此不需要标识是否访问过，而对于无向图来说，必须得标志是否访问过！为了防止某个节点多次入队，需要在其入队之前就将其设置成已访问！
+
+Template
+
+- 寻找多源；
+- 多源的广度优先遍历
+- 遍历时，不断与当前最大值比较，并更新；
+
+
+
 #### [542. 01 Matrix](https://leetcode-cn.com/problems/01-matrix/)
+
+首先把每个源点 0 入队，然后从各个 0 同时开始一圈一圈的向 1 扩散（每个 1 都是被离它最近的 0 扩散到的 ），扩散的时候可以设置 `dist` 来记录距离（即扩散的层次）并同时标志是否访问过。
+
+对于本题是可以直接修改原数组 `matrix` 来记录距离和标志是否访问的，这里要注意先把`matrix` 数组中 1 的位置设置成 -1 （无效的距离值来标志这个位置的 1 没有被访问过）
+
+* 每个点入队出队一次，所以时间复杂度：O(n * m)*O*(*n*∗*m*)
+
+- 最差的情况下即全都是 00 时，需要把 m * n*m*∗*n* 个 00 都入队，因此空间复杂度是 O(n * m)*O*(*n*∗*m*)
+
+```js
+var updateMatrix = function (matrix) {
+  if (!matrix.length || !matrix[0].length) return null;
+
+  let n = matrix.length;
+  let m = matrix[0].length;
+  let ans = new Array(n);
+  for (let i = 0; i < n; i++) ans[i] = new Array(m).fill(-1);
+
+  let queue = [];
+  for (let i = 0; i < n; i++)
+    for (let j = 0; j < m; j++) {
+      if (matrix[i][j] === 0) {
+        ans[i][j] = 0;
+        queue.push([i, j]);
+      }
+    }
+
+  let dist = 0;
+  while (queue.length) {
+    let len = queue.length;
+    dist++;
+    for (let i = 0; i < len; i++) {
+      let top = queue.shift();
+
+      if (top[0] + 1 < n && ans[top[0] + 1][top[1]] === -1) {
+        queue.push([top[0] + 1, top[1]]);
+        ans[top[0] + 1][top[1]] = dist;
+      }
+      if (top[0] - 1 >= 0 && ans[top[0] - 1][top[1]] === -1) {
+        queue.push([top[0] - 1, top[1]]);
+        ans[top[0] - 1][top[1]] = dist;
+      }
+      if (top[1] + 1 < m && ans[top[0]][top[1] + 1] === -1) {
+        queue.push([top[0], top[1] + 1]);
+        ans[top[0]][top[1] + 1] = dist;
+      }
+      if (top[1] - 1 >= 0 && ans[top[0]][top[1] - 1] === -1) {
+        queue.push([top[0], top[1] - 1]);
+        ans[top[0]][top[1] - 1] = dist;
+      }
+    }
+  }
+  return ans;
+};
+```
+
+
 
 [LeetCode 1162. As Far from Land as Possible](https://leetcode.com/problems/as-far-from-land-as-possible/)
 
-传统的 BFS 框架就是从起点开始向四周扩散，遇到终点时停⽌；⽽双向 BFS 则是从起点和终点同时开始扩散，当两边有交集的时候停⽌。
+将初始陆地坐标放进队列，然后从各个陆地**同时开始**一层一层的向海洋扩散，即逐次取出队列坐标，判断其上下左右是否有海洋，有则将海洋的值改为11，放进队列，第一轮结束后距离加一；之后每轮都是一样的操作，直至队列没有元素，那么最后扩散到的海洋就是最远的海洋
 
-双向 BFS 也有局限，因为你必须知道终点在哪⾥
+```js
+var maxDistance = function(grid) {
+    let [ queue_1, maxDistance] = [ [], -1]
+    for(let i = 0; i < grid.length; i++){
+        for(let j = 0; j < grid[0].length; j++){
+            if(grid[i][j] == 1)
+                queue_1.push([i, j])
+        }        
+    }
+    if(queue_1.length == (0 || (grid.length*grid[0].length))) return -1
+    while(queue_1.length != 0){
+        let len = queue_1.length;
+        for(let k = 0; k < len; k++){
+            let [i1, j1] = queue_1.shift();
+            if(i1 > 0 && grid[i1-1][j1] == 0){
+                grid[i1-1][j1] = 1;
+                queue_1.push([i1-1,j1]);
+            }
+            if(i1 < grid.length - 1 && grid[i1+1][j1] == 0){
+                grid[i1+1][j1] = 1;
+                queue_1.push([i1+1,j1]);
+            }
+            if(j1 > 0 && grid[i1][j1-1] == 0){
+                grid[i1][j1-1] = 1;
+                queue_1.push([i1,j1-1]);
+            }
+            if(j1 < grid[0].length - 1 && grid[i1][j1+1] == 0){
+                grid[i1][j1+1] = 1;
+                queue_1.push([i1,j1+1]);
+            }
+        }
+        maxDistance++;
+    }
+    return maxDistance;
+};
+```
+

@@ -178,6 +178,54 @@ function compose(...fns) {
 }
 ```
 
+## Promise
+
+```js
+let o = new Promise((res, rej) => setTimeout(res, 1000, 'o'));
+let r = new Promise((res, rej) => setTimeout(res, 500, 'r'));
+Promise.myRace = function (arr) {
+  return new Promise((res, rej) => {
+    arr.forEach((p) => {
+      if (p instanceof Promise) {
+        p.then((v) => res(v), rej);
+      } else {
+        res(p);
+      }
+    });
+  });
+};
+Promise.myRace([o, r, 6]).then((v) => console.log(v));
+```
+
+```js
+Promise.all = function(values){
+    return new Promise((resolve,reject)=>{
+        let arr = [];
+        let i = 0;
+        let processData = function(key,value){
+            arr[key] = value;
+            if(++i === values.length){
+                resolve(arr)
+            }
+        }
+        for(let i = 0; i < values.length; i++){
+            let current = values[i];
+            if(current instanceof Promise){   //判断传进来的是promise还是普通数据
+                current.then(y=>{
+                    processData(i,y)
+                },reject)
+            }else{
+                processData(i,current)
+            }
+        }
+    })
+}
+```
+
+
+
+
+
 ## Encapsulate a draggable element
 
 ```html
