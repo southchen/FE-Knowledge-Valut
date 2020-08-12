@@ -208,6 +208,8 @@ Promise.myRace([o, r, 6]).then((v) => console.log(v));
 
 ### All
 
+short-circuits when an input value is rejected
+
 `fulfilled`状态下返回值是一个按顺序存储每一个实例返回值的数组，而`rejected`状态下返回值则是第一个被拒绝实例的返回值
 
 ```js
@@ -271,7 +273,7 @@ Promise.myAll = function (iter) {
 
 状态变成`fulfilled`后，`Promise` 的监听函数接收到的参数是一个数组，每个成员对应一个传入`Promise.allSettled()`的 `Promise` 实例。{status:fulfilled,value:x} or {status:rejected,reason:x}
 
-```
+```js
 Promise.myAllSettled = function (iter) {
   let len = iter.length;
   let results = [];
@@ -304,7 +306,11 @@ Promise.myAllSettled = function (iter) {
 };
 ```
 
+### Any
 
+
+
+### 
 
 ```js
 Promise.prototype.myFinally = function (onFin) {
@@ -321,8 +327,14 @@ Promise.prototype.myFinally = function (onFin) {
 
 ### Sleep
 
-```
+sleep(500).then(() => { //dosth })
 
+```js
+function sleep(delay){
+	return new Promise((res)=>{
+        setTimeout(res,delay)
+    })
+}
 ```
 
 ### Task Queue
@@ -330,6 +342,14 @@ Promise.prototype.myFinally = function (onFin) {
 ```
 
 ```
+
+### Traffic lights
+
+```
+
+```
+
+
 
 ## Encapsulate a draggable element
 
