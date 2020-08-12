@@ -203,7 +203,7 @@ When x was a promise instance with 3 possible states:
 
 the same logic was applied within then resolve method
 
-```
+```js
 const resolvePromise =(promise2, x, resolve, reject)=>{
 	resolve(x)
 }
@@ -215,7 +215,7 @@ When x was function or other type of object,
 if(x && typeof x === 'object' || typeof x === 'function'){
         let called = false; // check for single invoke
         try{
-            let then = x.then;  // 这一行一定要放在 try/catch 块里
+            let then = x.then;  //If retrieving the property x.then results in a thrown exception e, reject promise with e as the reason.
             if(typeof then === 'function'){
                 //(y)=>{},(r)=>{},catch(e) only one of the three cb would run
                 then.call(x, y => {
@@ -229,7 +229,7 @@ if(x && typeof x === 'object' || typeof x === 'function'){
                     reject(r);
                 });
             }else{
-                resolve(x);
+                resolve(x);//即便p1rejected了，x= onRejected(this.resaon),return p2时，会走到resolve(x)中，即p2的state为resolved
             }
         }catch(e){
             if(called)  return;

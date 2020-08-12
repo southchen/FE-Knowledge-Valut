@@ -37,9 +37,7 @@ function myCreate(_proto) {
 
 ## Function
 
-### .prototype.call()
-
-### .prototype.apply()
+### .prototype.call() && .prototype.apply()
 
 ```js
 Function.prototype.myCall = function (thisArg = window, ...args) {
@@ -131,7 +129,7 @@ function currying(fn) {
 }
 ```
 
-### Function memoization
+### Function memorization
 
 ```js
 Function.prototype.memoized = function () {
@@ -169,20 +167,17 @@ function compose(...fns) {
 
 ## Promise
 
-# <<<<<<< HEAD
-
 ### Static methods
-
-> > > > > > > 5bd44931789d9a6de208f4bd36e48fc865168eb7
 
 ```js
 let o = new Promise((res, rej) => setTimeout(res, 1000, 'o'));
 let r = new Promise((res, rej) => setTimeout(res, 500, 'r'));
 Promise.myRace = function (arr) {
+    //第一个resolve/reject的
   return new Promise((res, rej) => {
     arr.forEach((p) => {
       if (p instanceof Promise) {
-        p.then((v) => res(v), rej);
+        p.then(res, rej);
       } else {
         res(p);
       }
