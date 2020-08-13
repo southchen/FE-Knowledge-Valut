@@ -304,6 +304,16 @@ Promise.myAllSettled = function (iter) {
 };
 ```
 
+### Any
+
+只要参数实例有一个变成`fulfilled`状态，包装实例就会变成`fulfilled`状态；如果所有参数实例都变成`rejected`状态，包装实例就会变成`rejected`状态。
+
+```
+
+```
+
+### prototype.finally
+
 
 
 ```js
