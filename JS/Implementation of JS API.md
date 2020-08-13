@@ -172,12 +172,12 @@ function compose(...fns) {
 ### Resolve
 
 ```js
-Promise.resolve = function(value) {
-    const promise = new Promise(function(resolve, reject) {
-        resolvePromise(promise, value, resolve, reject)
-    });
-    return promise;
-}
+Promise.resolve = function (value) {
+  const promise = new Promise(function (resolve, reject) {
+    resolvePromise(promise, value, resolve, reject);
+  });
+  return promise;
+};
 ```
 
 <a src='./Promise.md'>resolvePromise 参见</a>
@@ -192,7 +192,7 @@ Promise.resolve = function(value) {
 let o = new Promise((res, rej) => setTimeout(res, 1000, 'o'));
 let r = new Promise((res, rej) => setTimeout(res, 500, 'r'));
 Promise.myRace = function (arr) {
-    //第一个resolve/reject的
+  //第一个resolve/reject的
   return new Promise((res, rej) => {
     arr.forEach((p) => {
       if (p instanceof Promise) {
@@ -207,6 +207,8 @@ Promise.myRace([o, r, 6]).then((v) => console.log(v));
 ```
 
 ### All
+
+short-circuits when an input value is rejected
 
 `fulfilled`状态下返回值是一个按顺序存储每一个实例返回值的数组，而`rejected`状态下返回值则是第一个被拒绝实例的返回值
 
@@ -246,7 +248,8 @@ Promise.myAll = function (iter) {
   let count = 0;
   let ind = 0;
   return new Promise((res, rej) => {
-    for (let p of iter) {//for of for universal iterator
+    for (let p of iter) {
+      //for of for universal iterator
       let i = ind++; //在这里拿到i
       console.log(p);
       Promise.resolve(p).then(
@@ -271,7 +274,7 @@ Promise.myAll = function (iter) {
 
 状态变成`fulfilled`后，`Promise` 的监听函数接收到的参数是一个数组，每个成员对应一个传入`Promise.allSettled()`的 `Promise` 实例。{status:fulfilled,value:x} or {status:rejected,reason:x}
 
-```
+```js
 Promise.myAllSettled = function (iter) {
   let len = iter.length;
   let results = [];
@@ -314,8 +317,6 @@ Promise.myAllSettled = function (iter) {
 
 ### prototype.finally
 
-
-
 ```js
 Promise.prototype.myFinally = function (onFin) {
   return new Promise((res, rej) => {
@@ -327,15 +328,25 @@ Promise.prototype.myFinally = function (onFin) {
 };
 ```
 
-
-
 ### Sleep
 
-```
+sleep(500).then(() => { //dosth })
 
+```js
+function sleep(delay) {
+  return new Promise((res) => {
+    setTimeout(res, delay);
+  });
+}
 ```
 
 ### Task Queue
+
+```
+
+```
+
+### Traffic lights
 
 ```
 

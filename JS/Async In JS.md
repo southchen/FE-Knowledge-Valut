@@ -26,7 +26,6 @@ Generator 函数可以
 * 错误处理机制
 
 ```js
-
 function* gen(x){
   try {
     var y = yield x + 2;
@@ -39,7 +38,6 @@ function* gen(x){
 var g = gen(1);
 g.next();
 g.throw（'出错了'）;
-
 ```
 
 example of async request application using generator
@@ -49,17 +47,21 @@ var fetch = require('node-fetch');
 
 function* gen(){
   var url = 'https://api.github.com/users/github';
-  var result = yield fetch(url);
-  console.log(result.bio);
+   //pass the yield value to the iterator
+  var result = yield fetch(url); //var result = await fetch(url)
+    //obtain the value of result from iterator
+  console.log(result.bio);//apply the result obtained from async 
 }
 /****/
 var g = gen();
-var result = g.next();
-result.value.then(function(data){
-  return data.json();
-}).then(function(data){
-  g.next(data);
-});
+var result = g.next();//call the fetch(url), result =>iterator 
+result.value //result.val=>promise
+    .then(function(data){ // deal with the async result:data
+  			return data.json(); //pass to the next then
+		})
+    .then(function(data){ 
+  			g.next(data); //pass the result to the generator
+		});
 ```
 
 所谓消息双向通道就是我们可以从 next 函数中拿到 yield 语句后面的值，然后可以通过 next 函数传值把传进去的值变为 yield 语句的返回值。
@@ -68,12 +70,12 @@ result.value.then(function(data){
       function* gen() {
         var ret = yield 1 + 2;
         var num = yield 4; //num ->3
-        ret = yield ret + num; //ret->3
+        ret = yield ret + num; //ret->3 ->ret+num 3+4 ret->7
         console.log(ret);
       }
       //1+2+4
       let iter = gen();
-      let ret = iter.next(); //ret 1+2
+      let ret = iter.next(); //ret.val 1+2
       let num = iter.next(ret.value); //num 4
       console.log(ret.value, num.value);
       let final = iter.next(num.value);
@@ -121,7 +123,7 @@ gen.next().value.then(val => {
 function run(fn) {
   var gen = fn();
   function next(err, data) {
-    var result = gen.next(data);
+    var result = gen.next(data); //recursion
     if (result.done) return;
     result.value(next);
   }

@@ -1,3 +1,5 @@
+[toc]
+
 # Async Await & Generator
 
 ## Generator function
@@ -41,7 +43,7 @@ var gen = iterArr(arr);
 arr = [...gen];                        // ["a", "b", "c", "d", "e"]
 ```
 
-`for of` implemetation for `Object` 
+### `for of`  implemetation for `Object` 
 
 ```js
 Object.prototype[Symbol.iterator] = function* () {
@@ -54,7 +56,7 @@ for (const { key, value } of { a: 1, b: 2, c: 3 }) {
 }
 ```
 
-Task queue:
+### Task queue:
 
 ```js
 // goal: run by sequence valOne->valTwo->valThree
@@ -110,7 +112,6 @@ function run(genFunc) {
               Promise.resolve(value).then((val) => {
                 recursion(val);
               });
-              //}
             }
             return res(value);
           };
