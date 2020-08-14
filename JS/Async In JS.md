@@ -244,7 +244,6 @@ await sleep(1000);
 sleep(1000)
   .then(() => sleep(1000));
   .then(() => sleep(1000));
-
 // Concurrent Code (~1.0s)
 Promise.all([ sleep(1000), sleep(1000), sleep(1000) ]);
 ```
@@ -268,3 +267,28 @@ task queue
       }
 queue(['a', 'b', 'c']);
 ```
+
+await 后同步/异步操作
+
+````js
+async function async1() {
+  console.log("async1 start");
+
+ await async2();
+ console.log("async1 end");
+  //相当于====>
+ /*
+  new Promise(resolve => {
+    console.log("async2")
+    resolve()
+  })
+  .then(res => console.log("async1 end"))
+  */
+}
+async function async2() {
+    //同步操作：
+  console.log("async2");
+}
+
+````
+
