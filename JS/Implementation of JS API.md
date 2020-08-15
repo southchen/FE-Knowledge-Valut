@@ -181,15 +181,82 @@ function sleep(delay) {
 
 ### Task Queue
 
+```js
+function queue(iter){
+	let p =Promise.resolve();
+	for(let ele of iter){
+        p=p.then(()=>{
+            console.log(ele);
+            return new Promise(res=>{
+                setTimeout(()=>{res()},1000)
+            })
+        })
+    }
+}
+queue([1,2,3])
 ```
 
+reduce
+
+```js
+ function redQueue(arr) {
+        arr.reduce(
+          (p, cur) =>
+            p.then(
+              () =>
+                new Promise((res) => {
+                  setTimeout(() => res(console.log(cur)), 1000);
+                })
+            ),
+          Promise.resolve()
+        );
+      }
 ```
+
+
 
 ### Traffic lights
 
+```js
+function red() {
+    console.log('red');
+}
+function green() {
+    console.log('green');
+}
+function yellow() {
+    console.log('yellow');
+}
 ```
 
+```js
+ const light = function (timer, cb) {
+        return new Promise((resolve) => {
+          setTimeout(() => {
+            cb();
+            resolve();
+          }, timer);
+        });
+      };
+const step = function () {
+     Promise.resolve()
+          .then(() => {
+            return light(3000, red);
+          })
+          .then(() => {
+            return light(2000, green);
+          })
+          .then(() => {
+            return light(1000, yellow);
+          })
+          .then(() => {
+            return step();
+          });
+};
+setp()
 ```
+
+
 
 ## Encapsulate a draggable element
 
