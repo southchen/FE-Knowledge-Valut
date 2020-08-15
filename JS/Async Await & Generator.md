@@ -98,22 +98,26 @@ function scheduler(task) {
 
 Implement of async/await
 
+V1: directly returns a promise:
+
 ```js
 function run(genFunc) {
         let ite = genFunc();
         return new Promise((res, rej) => {
-          const recursion = (val = null) => {
+          const recursion = (val) => {
             try {
               var { done, value } = ite.next(val);
             } catch (err) {
-              rej(err);
+              return rej(err);
             }
             if (!done) {
-              Promise.resolve(value).then((val) => {
-                recursion(val);
-              });
+                //yield => promise wrap with Promise.resolve()
+              Promise.resolve(value)
+                //recursion call with obtained value
+                  .then((val) => recursion(val),(err)=>rej(err));
+            }else{
+              return res(value);
             }
-            return res(value);
           };
           recursion();
         });
@@ -149,41 +153,30 @@ function* testG() {
  *@return a function that returns a promise
 */
  function asyncToGenerator(genFunc) {
-        //console.log(arguments);
-        return function (...arg) {
-          //console.log(arguments);
+        return function (...arg) {//for the arguments the generator recieves
           const gen = genFunc.apply(null, arg);
           return new Promise((resolve, reject) => {
-            //创建递归操作的函数,来自动完成调用.next方法
-            function step(key, arg) {
-              //arg为 promise resolve的结果
-              let generatorResult;
+            function step(key, val) {
               try {
-                console.log('vale' + arg);
-                generatorResult = gen[key](arg); //gen.next(value) or gen.throw(err)//参数会变为yiled左边变量的值 第一次undefined
-                //generatorResult =>value=>yield 右边的值
+                 const { value, done }= gen[key](val); 
               } catch (err) {
                 return reject(err);
               }
-              const { value, done } = generatorResult; //value为getdata返回的promise
               if (done) {
-                return resolve(value); //最后一次yield的值=>promise resolve的值
+                return resolve(value); //complelte:yield value=>promise resolve(value)
               } else {
-                //done为false继续递归
                 return Promise.resolve(value).then(
                   (val) => {
-                    //传入resolve的结果，即上一个yield，给了它左边的变量
-                    step('next', val);
+                    step('next', val);//call gen.next(val)
                   },
                   (err) => {
-                    //promise 如果reject了，就调用generator的throw方法，并把error传入
-                    step('throw', err);
+                    step('throw', err);//cal gen.throw(err)
                   }
                 );
               }
             }
-            //调用递归函数
-            step('next');
+            //recursion entry
+            step('next'/*,null*/);
           });
         };
       }
