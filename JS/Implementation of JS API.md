@@ -17,6 +17,16 @@ function _new(Ctor, ...args) {
 }
 ```
 
+**if constructor explicitly returns an Object, the created object is not instance of this constructor** 
+
+```js
+function Fun2(){return {}}
+const f2 = new Fun2()
+console.log(f2 instanceof Fun2)  // false
+```
+
+
+
 ### Instanceof operator
 
 object instanceof constructor :point_right: myInstanceOf(leftVaule, rightVaule)
