@@ -282,6 +282,26 @@ setp()
 
 
 
+```js
+    async function main() {
+        await changeColor('红色', 2000);
+        await changeColor('黄色', 1000);
+        await changeColor('绿色', 3000);
+      }
+      main();
+```
+
+```js
+    function changeColor(color, time) {
+        return new Promise((res) => {
+          console.log(color);
+          setTimeout(res, time);
+        });
+      }
+```
+
+
+
 ## Encapsulate a draggable element
 
 ```html
