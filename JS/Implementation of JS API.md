@@ -25,11 +25,25 @@ const f2 = new Fun2()
 console.log(f2 instanceof Fun2)  // false
 ```
 
-
-
 ### Instanceof operator
 
 object instanceof constructor :point_right: myInstanceOf(leftVaule, rightVaule)
+
+```js
+function myInstanceof(obj, cto) {
+        if (
+          typeof obj != 'object' &&
+          typeof obj != 'function' &&
+          typeof cto != 'function'
+        ) {
+          return false;
+        }
+        let proto = Object.getPrototypeOf(obj);
+        if (!proto) return false;
+        if (proto == cto.prototype) return true;
+        return myInstanceof(proto, cto);
+}
+```
 
 ### Create
 
