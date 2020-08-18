@@ -8,11 +8,17 @@
 
 `let a = new ACon(args)` :point_right: `let a =_new(ACon,args)`
 
+创建一个新的对象
+将__proto__属性指向构造器函数的prototype
+将this关键字指向新创建的对象，使用新创建的对象执行构造器函数
+返回这个新建的对象
+
 ```js
 function _new(Ctor, ...args) {
   let obj = Object.create(Ctor.prototype);
   //bind the 'this'; obtain the result
   let result = Ctor.call(obj, ...args);
+     //if the ctor returns a object, return it; otherwise returns the new obj
   return result instanceof Object ? result : obj;
 }
 ```
@@ -47,17 +53,29 @@ function myInstanceof(obj, cto) {
 
 ### Create
 
+let sub = Object.create(Sup.prototype[, propertiesObject]);
+
 ```js
-let sub = Object.create(Sup.prototype);
-let sub = myCreate(Sup.prototype);
-function myCreate(_proto) {
+function myCreate(_proto,) {
+    //F should be a empty function without any instance prop of proto.constructor
   function F() {}
   F.prototype = _proto;
   return new F();
 }
+let sub = myCreate(Sup.prototype);
 ```
 
 ### Inheritance
+
+```js
+function inheritPrototype(subType, superType){
+    var prototype = Object.object(superType.prototype); 
+    prototype.constructor = subType; 
+    subType.prototype = prototype; 
+}
+```
+
+
 
 ## Function
 
