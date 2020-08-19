@@ -3,6 +3,7 @@
 - Algorithm exercises
 - Leetcode notes
 - JS implement
+- Framework source code
 
 Leetcode
 
@@ -12,11 +13,11 @@ Leetcode
 | 2      | Divided Conquer                                              |      |
 | 3      | Recursion                                                    |      |
 | 4      | Tree                                                         |      |
-| 5      | Stack                                                        |      |
+| 5      | Sorting                                                      |      |
 | 6      | Linked list                                                  |      |
-| 7      |                                                              |      |
-| 8      |                                                              |      |
-| 9      |                                                              |      |
-
+| 7      | Sliding window                                               |      |
+| 8      | Dynamic Programming                                          |      |
+| 9      | Greedy                                                       |      |
+| 9      | String realated                                              |      |
 
 
