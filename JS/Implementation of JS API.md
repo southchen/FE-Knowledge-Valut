@@ -75,138 +75,6 @@ function inheritPrototype(subType, superType){
 }
 ```
 
-
-
-## Function
-
-### .prototype.call() && .prototype.apply()
-
-```js
-Function.prototype.myCall = function (thisArg = window, ...args) {
-  let func = this;
-  let foo = Symbol();
-  //   值为原始值(数字，字符串，布尔值)的 this 会指向该原始值的自动包装对象(用 Object() 转换）
-  thisArg = Object(thisArg);
-  thisArg[foo] = func;
-  let result = thisArg[foo](...args);
-  delete thisArg[foo];
-  return result;
-};
-```
-
-```js
-Function.prototype.myApply = function (thisArg = window, ...args) {
-  let func = this;
-  let foo = Symbol();
-  thisArg = Object(thisArg);
-  thisArg[foo] = func;
-  let result = thisArg[foo](args);
-  delete thisArg[foo];
-  return result;
-};
-```
-
-### .prototype.bind()
-
-let boo = foo.bind(thisArg,args)
-
-```js
-Function.prototype.myBind = function (thisArg = window, ...args) {
-  return () => {
-    let result = this.call(thisArg, ...args);
-    return result;
-  };
-};
-```
-
-work with `new (funcA.bind(thisArg, args))`
-
-```js
-if (!Function.prototype.bind)
-  (function () {
-    var ArrayPrototypeSlice = Array.prototype.slice;
-    Function.prototype.bind = function (otherThis) {
-      if (typeof this !== 'function') {
-        // closest thing possible to the ECMAScript 5
-        // internal IsCallable function
-        throw new TypeError(
-          'Function.prototype.bind - what is trying to be bound is not callable'
-        );
-      }
-      var baseArgs = ArrayPrototypeSlice.call(arguments, 1),
-        baseArgsLength = baseArgs.length,
-        fToBind = this,
-        fNOP = function () {},
-        fBound = function () {
-          baseArgs.length = baseArgsLength; // reset to default base arguments
-          baseArgs.push.apply(baseArgs, arguments);
-          return fToBind.apply(
-            fNOP.prototype.isPrototypeOf(this) ? this : otherThis,
-            baseArgs
-          );
-        };
-
-      if (this.prototype) {
-        // Function.prototype doesn't have a prototype property
-        fNOP.prototype = this.prototype;
-      }
-      fBound.prototype = new fNOP();
-      return fBound;
-    };
-  })();
-```
-
-### Currying
-
-```js
-function currying(fn) {
-  let len = fn.length;
-  let fullArg = [];
-  return function curry(...args) {
-    len -= args.length;
-    fullArg.push(...args);
-    if (len === 0) return fn(...fullArg);
-    return curry;
-  };
-}
-```
-
-### Function memorization
-
-```js
-Function.prototype.memoized = function () {
-  let key = JSON.stringify(arguments);
-  this._cache = this.cache || {};
-  this._cache[key] = this._cache[key] || this.apply(this, arguments);
-  return this._cache[key];
-};
-Function.prototype.memoize = function () {
-  let fn = this;
-  if (fn.length === 0 || fn.length > 1) {
-    return;
-  }
-  return function () {
-    return fn.memoized.apply(fn, arguments);
-  };
-};
-```
-
-### Function Compose
-
-```js
-function compose(...fns) {
-  let start = fns.lenght - 1;
-  return function (...args) {
-    let i = start;
-    let result = fns[start].apply(this, args);
-    while (i--) {
-      result = fns[i].call(this, result);
-    }
-    return result;
-  };
-}
-```
-
 ## Asyncnorous
 
 ### Sleep
@@ -223,22 +91,31 @@ function sleep(delay) {
 
 ### Task Queue
 
+the traverse inside a iterator is a synchronous action => task queue was built synchronously => the task was pushed into the task queue aligned with the sequence in the iterator => the new Promise was returned to the next   
+
+  
+
 ```js
 function queue(iter){
 	let p =Promise.resolve();
 	for(let ele of iter){
-        p=p.then(()=>{
+         p=p.then(()=>{
             console.log(ele);
+             //ele()
             return new Promise(res=>{
-                setTimeout(()=>{res()},1000)
+            		res()
+              //  setTimeout(()=>{
+              //     res()
+              //  },1000)
             })
         })
     }
 }
 queue([1,2,3])
+//queue([foo,foo,foo])
 ```
 
-reduce
+### reduce
 
 ```js
  function redQueue(arr) {
@@ -252,10 +129,36 @@ reduce
             ),
           Promise.resolve()
         );
-      }
+}
 ```
 
+```js
+const createPromise = (time, id) => () =>
+  new Promise(res =>
+    setTimeout(() => {
+      console.log("promise", id);
+      res();
+    }, time)
+  );
+```
 
+```js
+async function awaitQueue(iter) {
+  for (let value of iter) {
+    await value();
+  }
+}
+
+awaitQueue([
+  createPromise(3000, 1),
+  createPromise(2000, 2),
+  createPromise(1000, 3)
+]);
+```
+
+Promise 串行队列一般情况下用的不多，因为串行会阻塞，而用户交互往往是并行的。
+
+并行：promise.all 配合await
 
 ### Traffic lights
 

@@ -83,7 +83,7 @@ MDN polyfill:
 ```js
 if (!Array.prototype.reduce) {
   Object.defineProperty(Array.prototype, 'reduce', {
-    value: function(callback /*, initialValue*/) {
+    value: function(callback /*, res*/) {
       if (this === null) {
         throw new TypeError( 'Array.prototype.reduce ' + 
           'called on null or undefined' );
@@ -221,7 +221,7 @@ version1:
 ```js
 Array.prototype.myReduce = function (fn, initValue) {
   if (initValue != undefined) {
-      //path the initValue as the first argument
+      //initValue as the first argument
     this.unshift(initValue);
   }
   const O = Object(this);
@@ -246,26 +246,26 @@ Array.prototype.myReduce = function (fn, initValue) {
 version2:
 
 ```js
-Array.prototype.myreduce = function (callback /*, initialValue*/) {
+Array.prototype.myreduce = function (callback /*, res*/) {
   let newArr = Object(this);
   let len = newArr.length >>> 0;
-  let initialValue,
+  let res,
     k = 0;
   if (arguments.length >= 2) {
-    initialValue = arguments[1];
+    res = arguments[1];
   } else {
     while (k < len && !(k in newArr)) k++;
     if (k >= len)
       throw new TypeError('Reduce of empty array with no initial value');
-    initialValue = newArr[k++];
+    res = newArr[k++];
   }
 
   for (let i = k; i < len; i++) {
     if (i in newArr) {
-      initialValue = callback(initialValue, newArr[i], i, newArr);
+      res = callback(res, newArr[i], i, newArr);
     }
   }
-  return initialValue;
+  return res;
 };
 
 ```
