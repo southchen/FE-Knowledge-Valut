@@ -333,6 +333,24 @@ readFileThunk(callback);
 var Thunk = (fileName)=>(callback)=> fs.readFile(fileName, callback); 
 ```
 
+Pipe
+
+
+
+```
+
+```
+
+
+
+Compose
+
+```
+
+```
+
+
+
 ## Function caching
 
 ### Memoize
