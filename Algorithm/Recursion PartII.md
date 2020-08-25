@@ -43,7 +43,9 @@ function insertRecu(arr) {
 }
 ```
 
+## Sort linked list
 
+//todo
 
 ## Tail recursion & currying
 
@@ -159,3 +161,21 @@ ES6的尾调用优化只在严格模式下开启，正常模式是无效的。
 > - `func.caller`：返回调用当前函数的那个函数。
 
 尾调用优化发生时，函数的调用栈会改写，因此上面两个变量就会失真。严格模式禁用这两个变量，所以尾调用模式仅在严格模式下生效。
+
+## Using generator to create fibonacci
+
+```js
+function* fibonacci(){
+  let [prev, cur] = [0, 1];
+  console.log(cur);
+  while(true) {
+    [prev, cur] = [cur, prev + cur];
+    yield cur;
+  }
+}
+
+for(let item of fibonacci()) {
+  if(item > 50) break;
+  console.log(item);
+}
+```

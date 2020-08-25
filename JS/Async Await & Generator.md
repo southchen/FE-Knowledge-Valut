@@ -58,6 +58,56 @@ for (const { key, value } of { a: 1, b: 2, c: 3 }) {
 
 ### Task queue:
 
+#### incorrect implement:
+
+```js
+async function test() {
+	let arr = [4, 2, 1]
+	arr.forEach(async item => {
+		const res = await handle(item)
+		console.log(res)
+	})
+	console.log('end')
+}
+
+function handle(x) {
+	return new Promise((resolve, reject) => {
+		setTimeout(() => {
+			resolve(x)
+		}, 1000 * x)
+	})
+}
+
+test()
+/**end
+1
+2
+4**/
+```
+
+#### iteration:
+
+```js
+async function test() {
+  let arr = [4, 2, 1]
+  let iterator = arr[Symbol.iterator]();
+  let res = iterator.next();
+  while(!res.done) {
+    let value = res.value;
+    console.log(value);
+    await handle(value);
+    res = iterater.next();
+  }
+	console.log('结束')
+}
+// 4
+// 2
+// 1
+// 结束
+```
+
+#### recursion:
+
 ```js
 // goal: run by sequence valOne->valTwo->valThree
 function* someTask(){
