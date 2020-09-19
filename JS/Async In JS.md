@@ -1,3 +1,8 @@
+---
+Title : async in JS
+---
+[toc]
+
 # Async In JS
 
 Single thread JS
@@ -64,7 +69,11 @@ result.value //result.val=>promise
 		});
 ```
 
-所谓消息双向通道就是我们可以从 next 函数中拿到 yield 语句后面的值，然后可以通过 next 函数传值把传进去的值变为 yield 语句的返回值。
+didirection tunnel 消息双向通道: 
+
+* value = .next() <= yield < value > 可以从 next 函数中拿到 yield 语句后面的值，
+
+* .next(val) => val = yield < ...> 可以通过 next 函数传值把传进去的值变为 yield 语句的返回值。
 
 ```js
       function* gen() {
@@ -87,7 +96,7 @@ Generator 函数就是一个异步操作的容器。它的自动执行需要一�
 * 回调函数。将异步操作包装成 Thunk 函数，在回调函数里面交回执行权。
 * Promise 对象。将异步操作包装成 Promise 对象，用 then 方法交回执行权。			
 
-## Async implementation by generator
+## Async/await implementation by generator
 
 - `async/await`自带执行器，不需要手动调用next()就能自动执行下一步
 - `async`函数返回值是Promise对象，而Generator返回的是生成器对象
@@ -118,8 +127,9 @@ gen.next().value.then(val => {
 
 我们希望生成器函数能自动往下执行，且yield能返回resolve的值
 
+## thunk function
+
 ```js
-//thunk
 function run(fn) {
   var gen = fn();
   function next(err, data) {
@@ -164,6 +174,8 @@ function run(genFunc) {
 ```
 
 Thunk 函数并不是 Generator 函数自动执行的唯一方案。因为自动执行的关键是，必须有一种机制，自动控制 Generator 函数的流程，接收和交还程序的执行权。回调函数可以做到这一点，Promise 对象也可以做到这一点。
+
+## output test
 
 ```js
 async function async1() {

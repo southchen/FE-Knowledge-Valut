@@ -2,6 +2,66 @@
 
 # Async Await & Generator
 
+## Async function
+
+Async functions are instances of the AsyncFunction constructor, and the await keyword is permitted within them. The async and await keywords enable asynchronous, promise-based behavior to be written in a cleaner style, avoiding the need to explicitly configure promise chains.
+
+```js
+async function foo() {
+   return 1
+}
+//is equivalent to:
+function foo() {
+   return Promise.resolve(1)
+}
+```
+
+async function主体同步直到遇到await关键字，await后面的语句相当于放入了一个.then中
+
+```js
+async function foo() {
+   await 1
+}
+//is equivalent to:
+function foo() {
+   return Promise.resolve(1).then(() => undefined)
+}
+```
+
+simply implement for `async`
+
+```js
+function _async(fn) {
+    return (...args) => Promise.resolve(fn(...args));
+}
+```
+
+## await
+
+The await operator is used to wait for a Promise. If the expression following await is not a promise, it will be converted to a resolved promise. The async function execution pause until a Promise is settled, and to resume execution of the async function after fulfillment. When resumed, the value of the await expression is that of the fulfilled Promise.
+
+```js
+function _await() {
+    let result = data.next();
+    while (true) {
+      console.log('waiting...', result); 
+      if (result.done) return result.value;//a
+      result = data.next();
+    }
+}
+
+let g = get();
+let a = _await(g);
+console.log(a)
+// awaiting... { value: 1, done: false }
+// awaiting... { value: 2, done: false }
+// awaiting... { value: 3, done: false }
+// awaiting... { value: 3, done: true }
+// 3
+```
+
+
+
 ## Generator function
 
 ```js
@@ -12,13 +72,22 @@ Generators are functions that can be exited and later re-entered. Their context 
 
 Not like a normal function which create a brand new context when it's called.
 
-Calling a generator function does not execute its body immediately; an [iterator](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols#iterator) object for the function is returned instead. When the iterator's `next()` method is called, the generator function's body is executed until the first [`yield`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/yield) expression, which specifies the value to be returned from the iterator or, with [`yield*`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/yield*), delegates to another generator function. 
+* Calling a generator function does not execute its body immediately; returns an iterator.
+* When the iterator's `next()` method is called, the generator function's body is executed until the first yield
 
-The `next()` method returns an object with a `value` property containing the yielded value and a `done` property which indicates whether the generator has yielded its last value, as a boolean. 
+ which specifies the value to be returned from the iterator or, with [`yield*`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/yield*), delegates to another generator function. 
 
-Calling the `next()` method with an argument will resume the generator function execution, replacing the `yield` expression where an execution was paused with the argument from `next()`.
+* The `next()` method returns an object {value: val, done:< Boolean>}
 
-with `Recusion`:
+* Calling the `next()` method with an argument will resume the generator function execution, replacing the `yield` expression where an execution was paused with the argument from `next()`.
+
+prototype methods:
+
+* Generator.prototype.next()
+* Generator.prototype.return()
+* Generator.prototype.throw()
+
+
 
 ```js
 function* iterArr(arr) {            //return a iterator
@@ -37,7 +106,7 @@ for(var x of iterArr(arr)) {
         console.log(x);               // a  b  c  d  e
  }
 
-// spread
+// spread symbol[iterator]
 var arr = [ 'a', ['b',[ 'c', ['d', 'e']]]];
 var gen = iterArr(arr);
 arr = [...gen];                        // ["a", "b", "c", "d", "e"]
@@ -69,7 +138,6 @@ async function test() {
 	})
 	console.log('end')
 }
-
 function handle(x) {
 	return new Promise((resolve, reject) => {
 		setTimeout(() => {
@@ -77,12 +145,13 @@ function handle(x) {
 		}, 1000 * x)
 	})
 }
-
 test()
-/**end
+/**
+end
 1
 2
-4**/
+4
+**/
 ```
 
 #### iteration:
@@ -146,7 +215,7 @@ function scheduler(task) {
 - `async` function returns Promise object，`generator` function returns iterator object
 - `await`can return the resolve/reject value of Promise
 
-Implement of async/await
+Implement of async/await : return promise + autorun
 
 V1: directly returns a promise:
 
@@ -175,7 +244,7 @@ function run(genFunc) {
       let r = run(myGenerator);
 ```
 
-Bable:
+Bable (reurns a function that returns a promise)
 
 ```js
 //mock async function
@@ -193,15 +262,7 @@ function* testG() {
         console.log('data2: ', data2);
         return 'success';
       }
-/*
- *the goal: to get data like this: 
- *var gen = asyncToGenerator(testG); 
- *gen().then((res) => console.log(res));
- */
-/*
- *@params function 
- *@return a function that returns a promise
-*/
+
  function asyncToGenerator(genFunc) {
         return function (...arg) {//for the arguments the generator recieves
           const gen = genFunc.apply(null, arg);
