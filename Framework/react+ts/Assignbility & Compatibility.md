@@ -33,3 +33,4 @@ Similarly, intersection types have the following assignability relationships:
 #### *assignable to*
 
 TypeScript considers a type *assignable to* another type if one is an acceptable substitute for the other. In other words, a `Cat` is *assignable to* an `Animal` because a `Cat` is an acceptable substitute for an `Animal`.
+

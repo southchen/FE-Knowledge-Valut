@@ -16,7 +16,7 @@ type TupleToObject<T extends readonly any[]> = {
 }
 ```
 
-#  First of Array
+First of Array
 
 ```
 type First<T extends any[]> = T extends [] ? never : T[0]
