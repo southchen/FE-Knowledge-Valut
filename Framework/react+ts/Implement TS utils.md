@@ -287,3 +287,15 @@ type PickNever<T> = {
 type GetRequired<T> = {[P in PickNever<MapToNever<T>>] : T[P]}
 ```
 
+## Vue
+
+```ts
+type Computed<C extends Record<string, any>> = { [P in keyof C]: ReturnType<C[P]> }
+
+declare function SimpleVue<D, C extends Record<string, any>, M>(options: {
+  data(this: {}): D,
+  computed: C & ThisType<D & Computed<C> & M>,
+  methods: M & ThisType<D & Computed<C> & M>
+}): D & Computed<C> & M
+```
+

@@ -10,6 +10,8 @@ Type `any` is assignable to every type
 
 ## unknown
 
+unknown represent a value that could be anything at runtime. To prove to TypeScript that what  you're doing is safe, you have to first prove to TypeScript that a value of type unknown actually |has a more specific subtype. You do that by refining the value using typeof, instanceof, or another type query or type guard.                            
+
 The type `unknown` is a type-safe version of the type `any`. Whenever you are thinking of using `any`, try using `unknown` first.
 
 Before we can perform any operation on values of type `unknown`, we must first narrow their types
@@ -79,3 +81,15 @@ Before we can perform any operation on values of type `unknown`, we must first n
     }
   }
   ```
+
+arguments is not typesafe. Instead, you should use a rest parameter:
+```ts
+//Before: 
+function f() { 
+    console.log(arguments) 
+}   
+//After: 
+function f(...args: unknown[]) { 
+    console.log(args) 
+} 
+```
