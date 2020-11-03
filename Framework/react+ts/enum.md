@@ -119,17 +119,17 @@ assert.equal(
 
 ### `keyof` and enums
 
-```
+```TS
 enum HttpRequestKeyEnum{
   Accpet='Accept',
   AcceptCharset='Accept-Charset',
 }
 
 type unu  = keyof HttpRequestKeyEnum //type unu = number | "toString" | "charAt" | "charCodeAt" | "concat" | "indexOf" | "lastIndexOf" | "localeCompare" | "match" | "replace" | "search" | "slice" | "split" | "substring" | "toLowerCase" | ... 27 more ... | "padEnd"
+
 type unu1 =keyof typeof HttpRequestKeyEnum //type unu1 = "Accpet" | "AcceptCharset"
+
 type unu2= typeof HttpRequestKeyEnum //type unu2 = typeof HttpRequestKeyEnum
-
-
 ```
 
 

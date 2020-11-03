@@ -4,11 +4,20 @@
 
 ## Basic types
 
-<img src="/Users/zhenrubian/Downloads/types.png" alt="types" style="zoom:70%;" />
+<img src="./types.png" alt="types" style="zoom:70%;" />
+
+类型是所有满足某些特征的 JS 值的集合。举个例子，**`number`** 类型，是所有浮点数、`NaN`、±`Infinity`、`-0` 的集合。
+我们知道，集合具有下列三个特征：
+
+- 确定性：给定一个元素，可以明确地判断其是否属于该集合。
+- 互异性：集合中不存在两个相同的元素。
+- 无序性：集合中的元素任意排列，仍然表示相同的集合。
 
 ### Top typ: super type of any other type
 
 ### any
+
+泛指一切可能的类型，对应全集。`T & any = any`，`any` 类型在任意运算中都是有传染性的
 
 ```ts
 any = AnyTypes
@@ -37,6 +46,12 @@ can be used after the types are narrowed down, otherwise only access to `!=` `==
 ### never
 
 `never` 是 `|` 运算的幺元，即 `x | never = x`。
+
+`never` 类型对应空集。任何值，即使是 `undefined` 或 `null` 也不能赋值给 `never` 类型。对于任意类型 T， `T ∩ never = never`，`T ∪ never = T`。
+
+- 一个中途抛出错误，或者存在死循环的函数永远不会有返回值，其返回类型是 `never`。
+- 在某些情况下，TS 会将空数组推断成 `never` 类型，这是因为在实际中，空数组经常被作为默认值使用。
+- 访问 never 类型变量的任意属性都是理论上可行的，虽然没有意义，因为 `never` 类型并不会有实例。
 
 ```ts
 never = AnyTypes  ❌
@@ -183,6 +198,8 @@ use object literal syntax to define the type of object (not to be confused with 
 
 > TYPE LITERAL
 > A type that represents a single value and nothing else.
+>
+> 对象类型的单一属性、单一函数类型叫做一条签名。
 
 ```ts
 interface ExampleInterface {
@@ -202,6 +219,8 @@ interface ExampleInterface {
   new(str: string): ExampleInstance; 
 }
 ```
+
+签名可以类比成集合间的映射。 它把冒号左边的原像集、连同签名方式，映射到右边的像集。
 
 ### Object vs object vs {}
 
@@ -384,6 +403,8 @@ A function A is a subtype of function B if A has the same or lower arity (number
 
 ### Assignability
 
+当且仅当类型 B 是 A 的子集时，A 兼容 B，B 可以被当成 A 处理。
+
 `assignability` refers to TypeScript’s rules for whether or not you can use a type A where another type B is required)
 
 For non-enum types, A is assignable to B if either of the following is true:
@@ -395,80 +416,6 @@ For enum types created with the enum or const enum keywords, a type A is assigna
 
 * A is a member of enum B.
 * B has at least one member that’s a number, and A is a number.
-
-## Generic
-
-Generic types are functions at the metalevel 
-
-#### type parameter
-
-A placeholder type used to enforce a type-level constraint in multiple places. Also known as polymorphic type parameter.
-
-#### generic bound
-
-```ts
-type Filter = {
-  <T>(array: T[], f: (item: T) => boolean): T[]
-}
-//Because T is scoped to a single signature, TypeScript will bind the T in this signature to a concrete type when you call a function of type filter. Each call to filter will get its own binding for T.
-let filter: Filter = (array, f) =>
-  // ...
-```
-
-Because we declared <T> as part of a call signature (right before the signature’s opening parenthesis, (), TypeScript will bind a concrete type to T when we actually call a function of type Filter.
-
-```ts
-type Filter<T> = {
-  (array: T[], f: (item: T) => boolean): T[]
-}
-//Because T is declared as part of Filter’s type (and not part of a specific signature’s type), TypeScript will bind T when you declare a function of type Filter.
-
-let filter: Filter = (array, f) => // Error TS2314: Generic type 'Filter'
-  // ...                           // requires 1 type argument(s).”
-
-//shorthand
-type Filter = <T>(array: T[], f: (item: T) => boolean) => T[] 
-```
-
-For each of TypeScript’s ways to declare a call signature, there’s a way to add a generic type to it
-
-Bounded Polymorphism
-
-Sometimes, saying “this thing is of some generic type T and that thing has to have the same type T" just isn’t enough. Sometimes you also want to say “the type U should be at least T.” We call this putting an upper bound on U.
-Add constraints:
-
-```ts
-function mapNode<T extends TreeNode>(  //👈
-  node: T, 
-  f: (value: string) => string
-): T {
-      return {
-    ...node,
-    value: f(node.value)
-  }
-}
-```
-
-#### model arity
-Another place where you’ll find yourself using bounded polymorphism is to model variadic functions (functions that take any number of arguments). 
-
-```ts
-function call<T extends unknown[], R>( //T is a subtype of unknown[] => an array or tuple of any type.
-  f: (...args: T) => R, 
-  ...args: T 
-): R { 
-  return f(...args)
-}
-```
-
-Generic Type Defaults
-
-```ts
-type MyEvent<T extends HTMLElement = HTMLElement> = {
-  target: T
-  type: string
-}
-```
 
 ## Interface & type alias
 
@@ -526,8 +473,6 @@ let a = tuple(1, true) // [number, boolean]
 
 ## Type Widening
 
-
-
 ```ts
 const a: {b: number} = { //use const
   b: 12
@@ -564,6 +509,8 @@ let a = {x: 3}                // {x: number}
 let b: {x: 3}                 // {x: 3}
 let c = {x: 3} as const       // {readonly x: 3}
 ```
+
+read only
 
 
 
