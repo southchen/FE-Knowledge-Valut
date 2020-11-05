@@ -193,8 +193,6 @@ return <div key={item}>{item}</div>;
 
 we can use to pair together a type and an object.
 
-
-
 ### in 
 
 A *mapped type* produces an object by looping over a collection of keys – for example:
@@ -349,5 +347,35 @@ type T11 = Foo<{ a: string, b: number }>;  // string | number
 type Bar<T> = T extends { a: (x: infer U) => void, b: (x: infer U) => void } ? U : never;
 type T20 = Bar<{ a: (x: string) => void, b: (x: string) => void }>;  // string
 type T21 = Bar<{ a: (x: string) => void, b: (x: number) => void }>;  // string & number
+```
+
+## Use cases
+
+### 提取数组子元素
+
+```ts
+type Flatten<T> = T extends (infer U)[] ? U : T;
+```
+
+### 提取 Promise 值
+
+```ts
+type Unpromisify<T> = T extends Promise<infer R> ? R : T;
+```
+
+### Tuple 转 Union
+
+```ts
+type ElementOf<T> = T extends Array<infer E> ? E : never;
+```
+
+### Union 转 Intersection
+
+```ts
+type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) extends ((
+  k: infer I
+) => void)
+  ? I
+  : never;
 ```
 
