@@ -13,7 +13,7 @@
 - 互异性：集合中不存在两个相同的元素。
 - 无序性：集合中的元素任意排列，仍然表示相同的集合。
 
-### Top typ: super type of any other type
+Top typ: super type of any other type
 
 ### any
 
@@ -27,7 +27,11 @@ any | AnyTypes =any
 
 ### Unknown
 
-```
+All types are assignable to `unknown`. The `unknown` type is only assignable to the `any` type and the `unknown` type itself. 
+
+In a union type, `unknown` absorbs every type. This means that if any of the constituent types is `unknown`, the union type evaluates to `unknown`:
+
+```ts
 unknown = AnyType
 AnyTypes = unknown ❌
 AnyTypes | unknown = unknown
@@ -41,7 +45,11 @@ can be used after the types are narrowed down, otherwise only access to `!=` `==
 
 > You can compare unknown values (with ==, ===, ||, &&, and ?), negate them (with !), and refine them (like you can any other type) with JavaScript’s typeof and instanceof operators. 
 
-### Bottom type: subtype of any other types
+We can narrow the `unknown` type to a more specific type in different ways, including the `typeof` operator, the `instanceof` operator, and custom type guard functions.
+
+
+
+Bottom type: subtype of any other types
 
 ### never
 
@@ -59,6 +67,28 @@ never = never
 AnyTypes = never
 AnyTypes & never //never
 AnyTypes | never // AnyTypes
+```
+
+#### Never vs void
+
+```ts
+// Return type: void
+function failwith1(message: string) {
+  throw new Error(message);
+}
+
+// Return type: never
+const failwith2 = function(message: string) {
+  throw new Error(message);
+};
+```
+
+ If you want a function declaration to have the return type `never`, you can explicitly annotate it:
+
+```ts
+function failwith1(message: string): never {
+  throw new Error(message);
+}
 ```
 
 ### Tuple
@@ -122,6 +152,135 @@ translate(Language.English)
 translate(11)
 ```
 
+### Array, Tuple
+
+When we use non-empty Array literals, TypeScript’s default is to infer list types (not tuple types):
+
+```ts
+// %inferred-type: (string | number)[]
+const arr = [123, 'abc'];
+
+const pair2: [number, number] = [1, 2];
+func(pair2); // OK
+```
+
+## Literal type
+
+* boolean
+
+  ```ts
+  type Result<T> =
+    | { success: true; value: T }
+    | { success: false; error: string };
+    function parseEmailAddress(
+    input: string | null | undefined
+  ): Result<string> {
+    // If the input is null, undefined, or the empty string
+    // (all of which are falsy values), we return early.
+    if (!input) {
+      return {
+        success: false,
+        error: "The email address cannot be empty."
+      };
+    }
+  
+    // We're only checking that the input matches the pattern
+    //   <something> @ <something> DOT <something>
+    // to keep it simple. Properly validating email addresses
+    // via regex is hard, so let's not even try here.
+    if (!/^\S+@\S+\.\S+$/.test(input)) {
+      return {
+        success: false,
+        error: "The email address has an invalid format."
+      };
+    }
+  
+    // At this point, control flow based type analysis
+    // has determined that the input has type string.
+    // Thus, we can assign input to the value property.
+    return {
+      success: true,
+      value: input
+    };
+  }
+  const parsed = parseEmailAddress("example@example.com");
+  
+  if (parsed.success) {
+    parsed.value; // OK
+    parsed.error; // Error
+  } else {
+    parsed.value; // Error
+    parsed.error; // OK
+  }
+  ```
+
+  
+
+* string
+
+  * A string literal type can be considered a subtype of the string type. This means that a string literal type is assignable to a plain string, but not vice-versa.
+
+  ```TS
+  interface Cash {
+    kind: "cash";
+  }
+  
+  interface PayPal {
+    kind: "paypal";
+    email: string;
+  }
+  
+  interface CreditCard {
+    kind: "credit";
+    cardNumber: string;
+    securityCode: string;
+  }
+  type PaymentMethod = Cash | PayPal | CreditCard;
+  function describePaymentMethod(method: PaymentMethod) {
+    switch (method.kind) {
+      case "cash":
+        // Here, method has type Cash
+        return "Cash";
+  
+      case "paypal":
+        // Here, method has type PayPal
+        return `PayPal (${method.email})`;
+  
+      case "credit":
+        // Here, method has type CreditCard
+        return `Credit card (${method.cardNumber})`;
+    }
+  }
+  ```
+
+  
+
+* Enum
+
+  ```TS
+  const enum HttpPort {
+    Http = 80,
+    Https = 443
+  }
+  function getScheme(port: HttpPort.Http): "http";
+  function getScheme(port: HttpPort.Https): "https";
+  function getScheme(port: HttpPort): "http" | "https" {
+    switch (port) {
+      case HttpPort.Http:
+        return "http";
+      case HttpPort.Https:
+        return "https";
+    }
+  }
+  
+  const scheme = getScheme(HttpPort.Http);
+  // Type "http"
+  ```
+
+  
+
+* Numeric
+
 #### Unions of string literal types can be checked for exhaustiveness
 
 ```ts
@@ -148,21 +307,7 @@ function toGerman2(value: NoYesStrings): string {
 }
 ```
 
-## Discriminated unions
 
-### Array, Tuple
-
-When we use non-empty Array literals, TypeScript’s default is to infer list types (not tuple types):
-
-```ts
-// %inferred-type: (string | number)[]
-const arr = [123, 'abc'];
-
-const pair2: [number, number] = [1, 2];
-func(pair2); // OK
-```
-
-as const
 
 ```ts
 // %inferred-type: readonly ["igneous", "metamorphic", "sedimentary"]
@@ -474,6 +619,55 @@ let a = tuple(1, true) // [number, boolean]
 ## Type Widening
 
 ```ts
+enum FlexDirection {
+  Row,
+  Column
+}
+const enumLiteral = FlexDirection.Row; // Type FlexDirection.Row
+let widenedEnumLiteral = enumLiteral; // Type FlexDirection
+
+
+// Type: "GET"
+const httpRequestMethod = "GET";
+// Type: string
+let httpRequestMethod = "GET";
+// OK, no type error
+httpRequestMethod = "POST";
+//for enum-style mapping objec
+const HTTPRequestMethod = {
+  CONNECT: "CONNECT",
+  DELETE: "DELETE",
+  GET: "GET",
+  HEAD: "HEAD",
+  OPTIONS: "OPTIONS",
+  PATCH: "PATCH",
+  POST: "POST",
+  PUT: "PUT",
+  TRACE: "TRACE"
+};
+// Type: string
+const httpRequestMethod = HTTPRequestMethod.GET;
+```
+
+The following example makes it a bit more obvious why TypeScript shouldn't infer a string literal type for object properties initialized with a string literal:
+
+```ts
+// Type: { name: string, jobTitle: string }
+const person = {
+  name: "Marius Schulz",
+  jobTitle: "Software Engineer"
+};
+
+// OK, no type error
+person.jobTitle = "Front End Engineer";
+```
+
+- `String literal types` are widened to type `string`
+- `Numeric literal types`are widened to type `number`
+- `Boolean literal types` are widened to type `boolean`
+- [Enum literal types]are widened to the type of the containing enum
+
+```ts
 const a: {b: number} = { //use const
   b: 12
 }            // Still {b: number}
@@ -500,7 +694,15 @@ let a: 'x' = 'x'          // 'x'
 const d: {x: 3} = {x: 3}  // {x: 3}”
 ```
 
-### as const
+## as const
+
+`const` Assertions for Literal Expressions
+
+A `const` assertion is a special type assertion that uses the `const` keyword instead of a specific type name. Using a `const` assertion on a literal expression has the following effects:
+
+1. No literal types in the literal expression will be [widened]
+2. Object literals will get [`readonly` properties]
+3. Array literals will become [`readonly` tuples]
 
 const opts your type out of widening and recursively marks its members as readonly, even for deeply nested data structures
 
@@ -511,6 +713,24 @@ let c = {x: 3} as const       // {readonly x: 3}
 ```
 
 read only
+
+### Using TypeScript Enums
+
+```tsx
+enum HTTPRequestMethod {
+  CONNECT = "CONNECT",
+  DELETE = "DELETE",
+  GET = "GET",
+  HEAD = "HEAD",
+  OPTIONS = "OPTIONS",
+  PATCH = "PATCH",
+  POST = "POST",
+  PUT = "PUT",
+  TRACE = "TRACE"
+}
+// Type: "GET"
+const httpRequestMethod = HTTPRequestMethod.GET;
+```
 
 
 

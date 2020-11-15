@@ -193,6 +193,35 @@ return <div key={item}>{item}</div>;
 
 we can use to pair together a type and an object.
 
+## Mapped type
+
+In essence, mapped types allow you to create new types from existing ones by mapping over property types. Each property of the existing type is transformed according to a rule that you specify. The transformed properties then make up the new type.
+
+```ts
+/**
+ * Make all properties in T optional
+ */
+type Partial<T> = {
+  [P in keyof T]?: T[P]
+};
+
+/**
+ * From T pick a set of properties K
+ */
+type Pick<T, K extends keyof T> = {
+  [P in K]: T[P]
+};
+
+/**
+ * Construct a type with a set of properties K of type T
+ */
+type Record<K extends string, T> = {
+  [P in K]: T
+};
+```
+
+
+
 ### in 
 
 A *mapped type* produces an object by looping over a collection of keys – for example:
@@ -210,6 +239,8 @@ The operator `in` is a crucial part of a mapped type: It specifies where the key
 
 Use keyof to get all of an object’s keys as a union of string literal types.
 
+We can use the [`keyof` operator](https://mariusschulz.com/blog/keyof-and-lookup-types-in-typescript) to retrieve a union of [string literal types](https://mariusschulz.com/blog/string-literal-types-in-typescript) that contains all property keys of this object type:
+
 ```ts
 type anyKey =keyof any //type anyKey = string | number | symbol
 type anyArrKey = keyof any[]//number | "length" | "toString" | "toLocaleString" | "pop" | "push" | "concat" | "join" | "reverse" | "shift" | "slice" | "sort" | "splice" | "unshift" | "indexOf" | "lastIndexOf" | ... 16 more ... | "flat
@@ -218,7 +249,11 @@ type anyObjKey = keyof object//never
 
 ### keying-in/ type lookup
 
-The indexed access operator `T[K]` returns the types of all properties of `T` whose keys are assignable to type `K`. 
+Indexed Access Types
+
+The indexed access operator `T[K]` returns the types of all properties of `T` whose keys are assignable to type `K`.
+
+ `T[K]`, a so-called *indexed access type* or *lookup type*. It represents the type of the property `K` of the type `T`.
 
 Note that you have to use bracket notation, not dot notation, to look up property types when keying in.
 
@@ -245,7 +280,44 @@ type Result3 = Obj[keyof Obj];
 type ValueOf<T> = T[keyof T]
 ```
 
-​    
+    ```ts
+function prop<T, K extends keyof T>(obj: T, key: K) {
+  return obj[key];
+}
+    ```
+
+```tsx
+interface ObjectConstructor {
+  // ...
+  entries<T extends { [key: string]: any }, K extends keyof T>(o: T): [keyof T, T[K]][];
+  // ...
+}
+```
+
+## nullish coalescing operator
+
+ We can use this operator to provide a fallback value for a value that might be `null` or `undefined`.
+
+```tsx
+null ?? "n/a"
+// "n/a"
+
+undefined ?? "n/a"
+// "n/a"
+false ?? true
+// false
+
+0 ?? 100
+// 0
+
+"" ?? "n/a"
+// ""
+
+NaN ?? 0
+// NaN
+```
+
+
 
 ### Totality / exhaustiveness checking
 
@@ -323,6 +395,30 @@ type res = Boxed<never> // 结果为never
 type res2 = never extends any ? { value: never} : never; // 结果为 { value: never}
 ```
 
+```TS
+type NonNullablePropertyKeys<T> = {
+  [P in keyof T]: null extends T[P] ? never : P
+}[keyof T];
+type User = {
+  name: string;
+  email: string | null;
+};
+
+type NonNullableUserPropertyKeys = NonNullablePropertyKeys<User>;
+
+type NonNullableUserPropertyKeys = {
+  name: "name";
+  email: never;
+}[keyof User];
+type NonNullableUserPropertyKeys = {
+  name: "name";
+  email: never;
+}["name" | "email"];
+type NonNullableUserPropertyKeys = "name";
+```
+
+
+
 
 
 ## infer
@@ -378,4 +474,3 @@ type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) extends (
   ? I
   : never;
 ```
-
