@@ -1,8 +1,10 @@
+[toc]
+
 # Functional component and UseEffect
 
-函数式组件捕获了渲染所用的值。（Function components capture the rendered values.）
+> 函数式组件捕获了渲染所用的值。（Function components capture the rendered values.）
 
-## 引用 vs 闭包capture value
+## 引用 vs 闭包 captured value
 
 class Component this.state是对state的引用，所以永远可以取到最新值。
 
@@ -10,13 +12,22 @@ class Component this.state是对state的引用，所以永远可以取到最新�
 
 hooks中，每次取到的值是当次渲染时的值。*effect 函数本身*在每一次渲染中都不相同。
 
-如果想在useeffect的回调函数里读取最新的值而不是捕获的值。最简单的实现方法是使用refs，但需要注意的是当你想要从*过去*渲染中的函数里读取*未来*的props和state，你是在逆潮而动。
+* Function component 中可以获得最新值，使用ref（一个在所有的组件渲染帧中共享的可变变量）
 
-在React中props和state（被强烈推荐）是不可变的，消除了闭包的缺陷。this是，而且永远是，可变(mutable)的。在函数式组件中，你也可以拥有一个在所有的组件渲染帧中共享的可变变量，ref。
+* Class component中也可以获得快照值，class里通过触发异步之前保存快照即可。
+
+在React中props和state（被强烈推荐）是不可变的，消除了闭包的缺陷。this是，而且永远是，可变(mutable)的。
+
+## 触发重渲染的几种情况
+
+* 父组件rerender则子组件re-render
+* this.setState or setState
+* this.forceUpdate
+* 祖先组件context变
 
 ## 依赖
 
-如果你设置了依赖项，effect中用到的所有组件内的值都要包含在依赖中。这包括props，state，函数 — 组件内的任何东西。
+如果你设置了依赖项，effect中用到的所有组件内的值都要包含在依赖中。这包括props，state，函数etc. 组件内的任何东西。
 
 一般建议把不依赖props和state的函数提到你的组件外面，并且把那些仅被effect使用的函数放到effect里面。如果这样做了以后，你的effect还是需要用到组件内的函数（包括通过props传进来的函数），可以在定义它们的地方用useCallback包一层。
 
@@ -36,30 +47,15 @@ useEffect(() => {
 
 `count` 变化时，我们并不希望重新 `setInterval`，故 deps 为空数组。这意味着该 hook 只在组件挂载时运行一次。Effect 中明明依赖了 `count`，但我们撒谎说它没有依赖，那么当 `setInterval` 回调函数执行时，获取到的 `count` 值永远为 0。
 
-此处为什么要用到 `count`？能否避免对其直接使用？
-有一个最佳实践：状态变更时，应该通过 setState 的函数形式来代替直接获取当前状态。
+**此处为什么要用到 `count`？能否避免对其直接使用？即不依赖外部变量**
+
+### 函数式更新
 
 ```JS
 setCount(c => c + 1);
 ```
 
-可以把 `count` 通过 ref 保存起来。
-
-```
-const [count, setCount] = useState(0);
-const countRef = useRef();
-countRef.current = count;
-
-useEffect(() => {
-    const id = setInterval(() => {
-        console.log(countRef.current);
-    }, 1000);
-    return () => clearInterval(id);
-}, []);
-
-```
-
-
+#### 函数式更新解决依赖函数问题
 
 在 useCount Hook 中， count 状态的改变会让 useMemo 中的 increase 和 decrease 函数被重新创建。
 
@@ -131,9 +127,7 @@ function Counter() {
 }
 ```
 
-solution 1：通过 setState 回调，让函数不依赖外部变量。
-
-useCount中：
+通过 setState 回调，让函数不依赖外部变量。
 
 ```JS
 export const useCount = () => {
@@ -155,55 +149,27 @@ export const useCount = () => {
 
 ```
 
-solution 2：通过 ref 来保存可变变量。
-
-```JS
-export const useCount = () => {
-  const [count, setCount] = useState(0);
-  const countRef = useRef(count);
-
-  useEffect(() => {
-    countRef.current = count;
-  });
-
-  const [increase, decrease] = useMemo(() => {
-    const increase = () => {
-      setCount(countRef.current + 1);
-    };
-
-    const decrease = () => {
-      setCount(countRef.current - 1);
-    };
-    return [increase, decrease];
-  }, []); // 保持依赖数组为空，这样 increase 和 decrease 方法都只会被创建一次
-
-  return [count, increase, decrease];
-};
-
-```
-
-## 优化
-
-只在effects中传递最小的信息会很有帮助。类似于setCount(c => c + 1)这样的更新形式比setCount(count + 1)传递了更少的信息，因为它不再被当前的count值“污染”。它只是表达了一种行为（“递增”）。
-
 依赖改变时，重新执行函数，但避免重复创建函数。
 
-```javascript
-function Counter() {
- const [count, setCount] = useState(0);
+但函数式更新拿不到新的props。‼️
 
- useEffect(() => {
- const id = setInterval(() => {
- setCount(c => c + 1);//函数式更新，不依赖count
- }, 1000);
- return () => clearInterval(id);
- }, []);//setInterval初始化执行一次
+### 使用ref.current更新
 
- return <h1>{count}</h1>;
-}
+```js
+const [count, setCount] = useState(0);
+const countRef = useRef();
+countRef.current = count;
+
+useEffect(() => {
+    const id = setInterval(() => {
+        console.log(countRef.current);
+    }, 1000);
+    return () => clearInterval(id);
+}, []);
+
 ```
 
-多个state，使用useReducer
+### 多个state，使用useReducer
 
 **当你想更新一个状态，并且这个状态更新依赖于另一个状态的值时，你可能需要用`useReducer`去替换它们。**
 
@@ -240,6 +206,12 @@ function reducer(state, action) {
 本质是让函数与数据解耦，函数只管发出指令，而不需要关心使用的数据被更新时，需要重新初始化自身。
 
 useReducer可以把更新逻辑和描述发生了什么分开。
+
+## useEffect中的函数
+
+方案1： 如果这个函数没有使用组件内的任何值，把它提到组件外面去定义
+
+方案2：如果这个函数只是在某个effect里面用到，把它定义到effect里面ƒ
 
 为了准确地依赖，最佳是将useEffect函数定义在内部
 
@@ -285,9 +257,7 @@ function SearchResults() {
 }
 ```
 
-
-
-第一个， **如果一个函数没有使用组件内的任何值，你应该把它提到组件外面去定义，然后就可以自由地在effects中使用：**
+如果要依赖函数， **如果一个函数没有使用组件内的任何值，你应该把它提到组件外面去定义，然后就可以自由地在effects中使用：**
 
 ```JS
 // ✅ Not affected by the data flow
@@ -313,6 +283,8 @@ function SearchResults() {
 你不再需要把它设为依赖，因为它们不在渲染范围内，因此不会被数据流影响。它不可能突然意外地依赖于props或state。
 
 或者， 你也可以把它包装成 `[useCallback` Hook]
+
+useCallback，它就是解决将函数抽到 useEffect 外部的问题。
 
 ```jsx
 function SearchResults() {
@@ -362,9 +334,7 @@ function Child({ fetchData }) {
 
 使用useCallback，函数完全可以参与到数据流中。我们可以说如果一个函数的输入改变了，这个函数就改变了。如果没有，函数也不会改变。感谢周到的useCallback，属性比如props.fetchData的改变也会自动传递下去。	
 
-
-
-但当多个effect函数时，使用useCallback提取到外部：
+使用useCallback提取到外部：
 
 ```js
 function Counter() {
@@ -390,47 +360,42 @@ function Counter() {
 
 进一步提取到组件外部，支持跨组件复用->自定义hooks
 
-```js
-function useFetch(count, step) {
- return useCallback(() => {
- const url = "https://v/search?query=" + count + "&step=" + step;
- }, [count, step]);
-}
-function Parent() {
- const [count, setCount] = useState(0);
- const [step, setStep] = useState(0);
- const [other, setOther] = useState(0);
- const fetch = useFetch(count, step); // 封装了 useFetch
+### 使用useCallback+ref封装
 
- useEffect(() => {
- fetch();
- }, [fetch]);
+父组件传给子组件一个function，子组件的useEffect中调用该函数，desp中依赖了该函数。
 
- return (
- <div>
- <button onClick={() => setCount(c => c + 1)}>setCount {count}</button>
- <button onClick={() => setStep(c => c + 1)}>setStep {step}</button>
- <button onClick={() => setOther(c => c + 1)}>setOther {other}</button>
- </div>
- );
-}
-```
+则每次父组件每次更新re-render，函数本身不变，但每次创建新的引用，子组件effect都会随着被触发。
 
-👆仍存在一个问题：count和step变，导致useCallback重新创建一个函数，没有必要。
+* 子组件useEffect的deps必须有该函数，否则将只会在mount时执行一次sideeffect，'Don't lie to deps'
 
-可以将依赖转化为ref，在useEffect中更新其.current的值。并封装成自定义hook
+* Solution1: 将deps替换为一个flag，标志着effect是否需要被执行。但function可能因为闭包而一直使用一个stale值。
 
-```js
-function useEventCallback(fn, dependencies) {
- const ref = useRef(null);
+* Solution2：使用useCallback包裹该函数，将deps转移到useCallback的deps中。把effect强刷的控制逻辑从callee转移到了caller。但有时props不可控，可能为第三方or其他组件中传入。且useCallback不能做语义保障。
 
- useEffect(() => {
- ref.current = fn;
- }, [fn, ...dependencies]);
+* solution 3: useEventCallback，引入ref，用ref.current保存传入的fn，当依赖项变化时重新赋值。再返回一个useCallback包裹的函数，依赖ref，每次更新时拿到ref的最新current，并执行。
 
- return useCallback(() => {
- const fn = ref.current;
- return fn();
- }, [ref]);
-}
-```
+  ```js
+  // child
+  useEventCallback(() => {
+    fetchData().then(result => {
+       setResult(result);
+    });
+  },[fetchData]);
+  function useEventCallback(fn, dependencies) {
+    const ref = useRef(() => {
+      throw new Error('Cannot call an event handler while rendering.');
+    });
+  
+    useEffect(() => {
+      ref.current = fn;
+    }, [fn, ...dependencies]);
+  
+    return useCallback(() => {
+      const fn = ref.current;
+      return fn();
+    }, [ref]); //关于ref使用，可参考dan写的useInterval文章
+  }
+  ```
+
+* Solution 4：使用useReducer，将副作用逻辑移动到reducer中，react保证了dispatch的不变性，可以作为依赖传入子组件。但useReducer没有原生支持异步。
+* Solution5： 如果可能将被依赖的变量提取到组件外。进一步可以封装为custom hook
