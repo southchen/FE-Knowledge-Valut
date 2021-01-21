@@ -1,5 +1,5 @@
-```
-onst MyReact = (function() {
+```js
+const MyReact = (function() {
   let _val // hold our state in module scope
   return {
     render(Component) {
@@ -18,7 +18,7 @@ onst MyReact = (function() {
 })()
 ```
 
-```
+```js
 function Counter() {
   const [count, setCount] = MyReact.useState(0)
   return {

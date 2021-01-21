@@ -195,6 +195,3 @@ dispatchLogin({ type: 'logout' });
 dispatchLogin({ type: 'changePwdAccount' });
 
 ```
-
-### 
-

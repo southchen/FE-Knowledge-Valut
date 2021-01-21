@@ -1,3 +1,48 @@
+## ReactNode vs ReactElement vs JAXElement
+
+```tsx
+type ReactText = string | number;
+type ReactChild = ReactElement | ReactText;
+
+interface ReactNodeArray extends Array<ReactNode> {}
+type ReactFragment = {} | ReactNodeArray;
+
+type ReactNode = ReactChild | ReactFragment | ReactPortal | boolean | null | undefined;
+```
+
+```typescript
+ interface ReactElement<P = any, T extends string | JSXElementConstructor<any> = string | JSXElementConstructor<any>> {
+    type: T;
+    props: P;
+    key: Key | null;
+}
+```
+
+JSX.Element is a ReactElement, with the generic type for props and type being any. It exists, as various libraries can implement JSX in their own way, therefore JSX is a global namespace that then gets set by the library, React sets it like this:
+
+```typescript
+declare global {
+  namespace JSX {
+    interface Element extends React.ReactElement<any, any> { }
+  }
+}
+```
+
+`Component`s return:
+
+```js
+ render(): ReactNode;
+```
+
+And functions are "stateless components":
+
+```js
+ interface StatelessComponent<P = {}> {
+    (props: P & { children?: ReactNode }, context?: any): ReactElement | null;
+    // ... doesn't matter
+}
+```
+
 ## Ref
 
 ```tsx

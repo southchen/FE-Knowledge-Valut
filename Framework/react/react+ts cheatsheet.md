@@ -4,7 +4,7 @@
 
 ## UseState
 
-```
+```tsx
 const [user, setUser] = React.useState<IUser | null>(null);
 
 // later...
@@ -46,7 +46,7 @@ function Counter() {
 
 Redux
 
-```
+```tsx
 import { Reducer } from 'redux';
 
 export function reducer: Reducer<AppState, Action>() {}
@@ -54,7 +54,7 @@ export function reducer: Reducer<AppState, Action>() {}
 
 ## useRef
 
-```
+```tsx
 const ref1 = useRef<HTMLElement>(null!);
 const ref2 = useRef<HTMLElement | null>(null);
 ```
@@ -63,7 +63,7 @@ The first option will make `ref1.current` read-only, and is intended to be passe
 
 `null!` is a non-null assertion operator (the `!`). It asserts that any expression before it is not `null` or `undefined`, so if you have `useRef<HTMLElement>(null!)` it means that you're instantiating the ref with a current value of `null` but lying to TypeScript that it's not `null`.
 
-```
+```tsx
 function MyComponent() {
   const ref1 = useRef<HTMLElement>(null!);
   useEffect(() => {
@@ -75,7 +75,7 @@ function MyComponent() {
 
 The second option will make `ref2.current` mutable, and is intended for "instance variables" that you manage yourself.
 
-```
+```tsx
 function TextInputWithFocusButton() {
   // initialise with null, but tell TypeScript we are looking for an HTMLInputElement
   const inputEl = React.useRef<HTMLInputElement>(null);
@@ -101,7 +101,7 @@ function TextInputWithFocusButton() {
 
 [TS 3.4 const assertions](https://devblogs.microsoft.com/typescript/announcing-typescript-3-4/#const-assertions):
 
-```js
+```tsx
 export function useLoading() {
   const [isLoading, setState] = React.useState(false);
   const load = (aPromise: Promise<any>) => {
@@ -116,7 +116,7 @@ export function useLoading() {
 
 
 
-```js
+```tsx
 function tuplify<T extends any[]>(...elements: T) {
   return elements;
 }
@@ -445,6 +445,8 @@ Record: A map from a key type to a value type
 Required: Make all properties in an object required
 ReturnType A function's return type
 ```
+
+
 
 ## Wrapping/Mirroring a HTML Element
 
