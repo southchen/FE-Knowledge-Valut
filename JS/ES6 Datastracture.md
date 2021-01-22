@@ -16,6 +16,12 @@
 
 * primitive data type
 
+* Symbol 表示独一无二的值
+
+* Symbol 类型的"真实值"无法获取,没有对应的字面量
+
+* Symbol 类型的意义在于区分彼此和不重复,不在于真实值
+
 * `Symbol(< description >)` function returns an anonymous, unique value
 
   ```js
@@ -33,14 +39,14 @@
 
   
 
-* Not `new Symbol()`  ❌
+* Not `new Symbol()`  ❌ typeof => symbol
 
   ```js
   let sym = new Symbol()  // TypeError
   ```
 
   ```js
-  let sym = Symbol('foo')
+  let sym = Symbol('foo') //takes string as argument
   typeof sym      // "symbol" 
   let symObj = Object(sym)
   typeof symObj   // "object"
@@ -55,6 +61,34 @@
   ```
 
   Returns a string containing the description of the Symbol. Overrides the Object.prototype.toString() method.
+  
+  ```js
+  
+  // 1. 对象字面量
+  let goods = {};
+  let name = Symbol('name');
+  goods = {
+    [name]: '杯子'
+  };
+  
+  let id = Symbol('id');
+  goods[id]= 'a001'; //作为属性名赋值
+  console.log(goods[id]); //作为属性名取值 = a001
+  // console.log(goods.id); //不能这样取，因为不是字符串属性名
+  
+  //2. Object.defineProperty方式
+  let price = Symbol('price');
+  Object.defineProperty(goods, price, {value: 29.99});
+  
+  // 3. Object.defineProperties方式
+  let count = Symbol('count');
+  Object.defineProperties(goods,{
+    [count]:{value: 101}
+  })
+  console.log(goods);
+  ```
+  
+  
 
 ### Use cases
 
@@ -108,6 +142,40 @@ for(let item of Reflect.ownKeys(obj)){
 ```
 
 The symbol can protect the propertise to be looped from outside.
+
+### Symbol.for()
+
+1.  Symbol.for() 对每个关键字符串执行幂等操作。即，第一次使用字符串调用时，会在全局运行注册表中查询，如果没有，就创建一个新的符号实例；如果有，就返回该字符串实例。具体用法见下方代码
+2. 即使采用相同的符号描述，在全局注册表中定义的符号 跟使用symbol()定义的符号也不等同
+
+```js
+// 1. Symbol.for的用法。注册表中无--->创建；有--->使用
+let globalSymbol = Symbol.for('test');
+console.log(globalSymbol);    //Symbol(test)
+let test = Symbol.for('test');
+console.log(globalSymbol === test); //true
+
+// 2.即使采用相同的符号描述，在全局注册表中定义的符号跟使用symbol()定义的符号也不等同
+let localSymbol = Symbol('test');
+console.log(globalSymbol === localSymbol); //false
+
+// 3.全局注册表中的符号，必须使用字符串键来创建。无字符串名时，被转换为undefined
+let emptySymbol = Symbol.for();
+console.log(emptySymbol);   //Symbol(undefined)
+
+//4.Symbol.keyFor用来查询全局注册表
+let test1 = Symbol.for('test1');
+let test2 = Symbol('test2');
+console.log(Symbol.keyFor(test1));  //test1
+console.log(Symbol.keyFor(test2));  //undefined
+console.log(Symbol.keyFor(1233));  //TypeError: 1233 is not a symbol
+
+```
+
+- Object.getOwnPropertyNames 返回对象的自有 属性 数组
+- Object.getOwnPropertySymbols 返回对象的自有 属性符号 数组 
+- Reflect.ownKeys 返回对象的自有 属性名（前两者都有）
+- Object.getOwnPropertyDescriptors 返回对象的自有 属性描述（前两者都有）
 
 ## Map
 

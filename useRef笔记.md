@@ -17,7 +17,13 @@
 
 ## useImperativeHandle
 
-```
+```javascript
+const ref = useRef()
+const createHandle = ()=>{
+  return {
+    exposedProp:xxx
+  }
+}
 useImperativeHandle(ref, createHandle, [deps]);
 ```
 
@@ -145,5 +151,93 @@ lotteryRef.current.startLottery();
 
 
 
+## 源码
 
+```typescript
+    useImperativeHandle<T>(
+      ref: {|current: T | null|} | ((inst: T | null) => mixed) | null | void,
+      create: () => T,
+      deps: Array<mixed> | void | null,
+    ): void {
+      currentHookNameInDev = 'useImperativeHandle';
+      mountHookTypesDev();
+      checkDepsAreArrayDev(deps);
+      return mountImperativeHandle(ref, create, deps);
+    },
+```
+
+
+
+```typescript
+function imperativeHandleEffect<T>(
+  create: () => T,
+  ref: {|current: T | null|} | ((inst: T | null) => mixed) | null | void,
+) {
+  if (typeof ref === 'function') {
+    const refCallback = ref;
+    const inst = create();
+    refCallback(inst);
+    return () => {
+      refCallback(null);
+    };
+  } else if (ref !== null && ref !== undefined) {
+    const refObject = ref;
+    if (__DEV__) {    }
+    const inst = create();
+    refObject.current = inst;
+    return () => {
+      refObject.current = null;
+    };
+  }
+}
+
+function mountImperativeHandle<T>(
+  ref: {|current: T | null|} | ((inst: T | null) => mixed) | null | void,
+  create: () => T,
+  deps: Array<mixed> | void | null,
+): void {
+  if (__DEV__) {  }
+  // TODO: If deps are provided, should we skip comparing the ref itself?
+  const effectDeps =
+    deps !== null && deps !== undefined ? deps.concat([ref]) : null;
+
+  return mountEffectImpl(
+    UpdateEffect,
+    HookLayout,
+    imperativeHandleEffect.bind(null, create, ref),
+    effectDeps,
+  );
+}
+
+function updateImperativeHandle<T>(
+  ref: {|current: T | null|} | ((inst: T | null) => mixed) | null | void,
+  create: () => T,
+  deps: Array<mixed> | void | null,
+): void {
+  if (__DEV__) {  }
+  // TODO: If deps are provided, should we skip comparing the ref itself?
+  const effectDeps =
+    deps !== null && deps !== undefined ? deps.concat([ref]) : null;
+
+  return updateEffectImpl(
+    UpdateEffect,
+    HookLayout,
+    imperativeHandleEffect.bind(null, create, ref),
+    effectDeps,
+  );
+}
+
+function mountEffectImpl(fiberFlags, hookFlags, create, deps): void {
+  const hook = mountWorkInProgressHook();
+  const nextDeps = deps === undefined ? null : deps;
+  currentlyRenderingFiber.flags |= fiberFlags;
+  hook.memoizedState = pushEffect(
+    HookHasEffect | hookFlags,
+    create,
+    undefined,
+    nextDeps,
+  );
+}
+
+```
 
