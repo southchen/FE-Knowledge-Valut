@@ -47,6 +47,21 @@ can be used after the types are narrowed down, otherwise only access to `!=` `==
 
 We can narrow the `unknown` type to a more specific type in different ways, including the `typeof` operator, the `instanceof` operator, and custom type guard functions.
 
+在静态编译的时候，unknown 不能调用任何方法，而 any 可以。
+
+unknown 的一个使用场景是，避免使用 any 作为函数的参数类型而导致的静态类型检查 bug：
+
+```typescript
+function test(input: unknown): number {
+  if (Array.isArray(input)) {
+    return input.length;    
+// Pass: 这个代码块中，类型守卫已经将input识别为array类型
+  }
+  return input.length;      
+// Error: 这里的input还是unknown类型，静态检查报错。如果入参是any，则会放弃检查直接成功，带来报错风险
+}
+```
+
 
 
 Bottom type: subtype of any other types
@@ -116,9 +131,35 @@ as[4] = 5            // Error TS2542: Index signature in type
 
 ### void null undefined
 
+```tsx
+function foo() {}  	
+// 这个空函数没有返回任何值，返回类型缺省为void
+const a = foo();	
+// 此时a的类型定义为void，你也不能调用a的任何属性方法
+```
+
 In TypeScript the only thing of type `undefined` is the value `undefined`, and the only thing of type` null` is the value `null`.
 
 `undefined` means that something hasn’t been defined yet, and null means an absence of a value (like if you tried to compute a value, but ran into an error along the way). 
+
+void 和 undefined 类型最大的区别是，你可以理解为 undefined 是 void 的一个子集，当你对函数返回值并不在意时，使用 void 而不是 undefined。
+
+```typescript
+// Parent.tsx
+function Parent(): JSX.Element {
+  const getValue = (): number => { return 2 };   	/* 这里函数返回的是number类型 */
+
+  return <Child getValue={getValue} />
+}
+// Child.tsx
+type Props = {
+  getValue: () => void;  // 这里的void表示逻辑上不关注具体的返回值类型，number、string、undefined等都可以
+}
+function Child({ getValue }: Props) => <div>{getValue()}</div>
+
+```
+
+never 是指没法正常结束返回的类型，一个必定会报错或者死循环的函数返回值类型，永远没有相交的类型。任何类型联合上 never 类型，还是原来的类型。无法把其他类型赋给 never
 
 ### Enum & number
 

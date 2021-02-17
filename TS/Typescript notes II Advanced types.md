@@ -6,11 +6,28 @@
 
 Generic types are functions at the metalevel 
 
+承载了从静态定义到动态调用的桥梁，同时也是 TS 对自己类型定义的元编程。
+
 ### type parameter
 
 A placeholder type used to enforce a type-level constraint in multiple places. Also known as polymorphic type parameter.
 
 ### generic bound
+
+```typescript
+//no constraint
+function fill<T>(length: number, value: T): T[] {
+  return new Array(length).fill(value);
+}
+//has to have a constraint
+function sum<T extends number>(value: T[]): number {
+  let count = 0;
+  value.forEach(v => count += v);
+  return count;
+}
+```
+
+
 
 ```ts
 type Filter = {
@@ -220,9 +237,15 @@ type Record<K extends string, T> = {
 };
 ```
 
-
+## Operation
 
 ### in 
+
+in 只能用在类型的定义中，可以对枚举类型进行遍历
+
+```
+[ 自定义变量名 in 枚举类型 ]: 类型
+```
 
 A *mapped type* produces an object by looping over a collection of keys – for example:
 
@@ -231,11 +254,20 @@ A *mapped type* produces an object by looping over a collection of keys – for 
 type Result = {
   [K in 'a' | 'b' | 'c']: number
 };
+
+// 这个类型可以将任何类型的键值转化成number类型
+type TypeToNumber<T> = {
+  [key in keyof T]: number
+}
 ```
 
 The operator `in` is a crucial part of a mapped type: It specifies where the keys for the new object literal type come from.
 
 ### keyof
+
+```code
+<type> = keyof <type>
+```
 
 Use keyof to get all of an object’s keys as a union of string literal types.
 
@@ -246,6 +278,29 @@ type anyKey =keyof any //type anyKey = string | number | symbol
 type anyArrKey = keyof any[]//number | "length" | "toString" | "toLocaleString" | "pop" | "push" | "concat" | "join" | "reverse" | "shift" | "slice" | "sort" | "splice" | "unshift" | "indexOf" | "lastIndexOf" | ... 16 more ... | "flat
 type anyObjKey = keyof object//never
 ```
+
+keyof 的一个典型用途是限制访问对象的 key 合法化，因为 any 做索引是不被接受的。
+
+```typescript
+function getValue (p: Person, k: keyof Person) {
+  return p[k];  
+  // 如果k不如此定义，则无法以p[k]的代码格式通过编译
+}
+```
+
+### typeof
+
+typeof 只能用在具体的对象上
+
+```typescript
+const me: Person = { name: 'gzx', age: 16 };
+type P = typeof me;  // { name: string, age: number | undefined }
+const you: typeof me = { name: 'mabaoguo', age: 69 }  // 可以通过编译
+
+type PersonKey = keyof typeof me;   // 'name' | 'age'
+```
+
+
 
 ### keying-in/ type lookup
 
@@ -366,8 +421,6 @@ a way to describe an object as a map from something to something. With a regular
 
 ## Conditional types
 
-
-
 distributive conditional types
 
 在上面的conditional types里，如果我们的 checked type是 naked type那么 conditional types就被称为distributive conditional types。distributive conditional types具有如下性质
@@ -443,6 +496,24 @@ type T11 = Foo<{ a: string, b: number }>;  // string | number
 type Bar<T> = T extends { a: (x: infer U) => void, b: (x: infer U) => void } ? U : never;
 type T20 = Bar<{ a: (x: string) => void, b: (x: string) => void }>;  // string
 type T21 = Bar<{ a: (x: string) => void, b: (x: number) => void }>;  // string & number
+```
+
+### infer + conditonal types
+
+不用预先指定在泛型列表中，在运行时会自动判断，不过你得先预定义好整体的结构。
+
+infer 的中文是“推断”的意思，一般是搭配上面的泛型条件语句使用的，所谓推断，就是你不用预先指定在泛型列表中，在运行时会自动判断，不过你得先预定义好整体的结构。举个例子
+
+```typescript
+type Foo<T> = T extends {t: infer Test} ? Test: string
+```
+
+`{t: infer Test}`可以看成是一个包含`t属性`的**类型定义**，这个`t属性`的 value 类型通过`infer`进行推断后会赋值给`Test`类型，如果泛型实际参数符合`{t: infer Test}`的定义那么返回的就是`Test`类型，否则默认给缺省的`string`类型。
+
+```tsx
+type One = Foo<number>  // string，因为number不是一个包含t的对象类型
+type Two = Foo<{t: boolean}>  // boolean，因为泛型参数匹配上了，使用了infer对应的type
+type Three = Foo<{a: number, t: () => void}> // () => void，泛型定义是参数的子集，同样适配
 ```
 
 ## Use cases
